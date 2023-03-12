@@ -4,15 +4,57 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Sharing"
+        xmlns:FrameUI="clr-namespace:Sharing.CustomUI.FrameUI"
 		xmlns:vm="clr-namespace:Sharing.ViewModels.Windows.Main"
         mc:Ignorable="d"
         Title="Шары"
-		Height="450"
+		WindowStartupLocation="CenterScreen"
+		ResizeMode="CanMinimize"
+		Height="600"
+		DataContext="{Binding MainWindowVM,Source={StaticResource Locator}}"
 		Width="800">
-	<Window.DataContext>
-		<vm:MainWindowVM/>
-	</Window.DataContext>
-    <Grid>
-	
-    </Grid>
+	<DockPanel>
+		<StatusBar DockPanel.Dock="Bottom" Height="25">
+
+		</StatusBar>
+		<Grid>
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="200"/>
+				<ColumnDefinition/>
+			</Grid.ColumnDefinitions>
+			<Grid Grid.Column="0" Background="{StaticResource StateButton}">
+				<Grid.RowDefinitions>
+					<RowDefinition/>
+					<RowDefinition/>
+				</Grid.RowDefinitions>
+				<StackPanel Orientation="Vertical" Grid.Row="0">
+					<Button Style="{StaticResource LeftMenuButton}"
+							Width="190" Margin="0 5 0 0 "
+							Content="Раздача"
+							Tag="{Binding FocusSharingMenu}"
+							Command="{Binding OpenMenuCommand}"
+							CommandParameter="{Binding SharingPage, Source={StaticResource Locator}}"/>
+					<Button Style="{StaticResource LeftMenuButton}"
+							Width="190"
+							Margin="0 5 0 0"
+							Content="Скачать"
+							Tag="{Binding FocusDowloadMenu}"
+							Command="{Binding OpenMenuCommand}"
+							CommandParameter="{Binding DowloadPage, Source={StaticResource Locator}}"/>
+				</StackPanel>
+				<StackPanel Orientation="Vertical" Grid.Row="1" VerticalAlignment="Bottom">
+					<Button Style="{StaticResource LeftMenuButton}"
+							Width="190"
+							Margin="0 0 0 5"
+							Content="Настройки"
+							Tag="{Binding FocusSettingsMenu}"
+							Command="{Binding OpenMenuCommand}"
+							CommandParameter="{Binding SettingsPage, Source={StaticResource Locator}}"/>
+				</StackPanel>
+			</Grid>
+			<DockPanel Grid.Column="1">
+				<Frame FrameUI:DisableNavigation.Disable="True"  NavigationUIVisibility="Hidden" Content="{Binding SelectedPage}"/>
+			</DockPanel>
+		</Grid>
+	</DockPanel>
 </Window>
