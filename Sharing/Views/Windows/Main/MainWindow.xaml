@@ -13,6 +13,6 @@
 		<vm:MainWindowVM/>
 	</Window.DataContext>
     <Grid>
-
+	
     </Grid>
 </Window>
