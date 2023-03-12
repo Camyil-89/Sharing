@@ -10,6 +10,8 @@ namespace Sharing.ViewModels
 	internal class Locator
 	{
 		public Windows.Main.MainWindowVM MainWindowVM => App.Host.Services.GetRequiredService<Windows.Main.MainWindowVM>();
+		public Pages.Dowload.DowloadPageVM DowloadPageVM => App.Host.Services.GetRequiredService<Pages.Dowload.DowloadPageVM>();
+		public Pages.Sharing.SharingPageVM SharingPageVM => App.Host.Services.GetRequiredService<Pages.Sharing.SharingPageVM>();
 
 
 		public Views.Pages.Sharing.SharingPage SharingPage => App.Host.Services.GetRequiredService<Views.Pages.Sharing.SharingPage>();

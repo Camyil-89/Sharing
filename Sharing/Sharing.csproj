@@ -11,10 +11,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="ViewModels\Pages\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="Costura.Fody" Version="5.7.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -27,7 +23,8 @@
   <ItemGroup>
     <ProjectReference Include="..\Sharing.Client\Sharing.Client.csproj" />
     <ProjectReference Include="..\Sharing.Server\Sharing.Server.csproj" />
-    <ProjectReference Include="..\Sharing.Services.Log\Sharing.Services.Log.csproj" />
+    <ProjectReference Include="..\Sharing.Services.Logging\Sharing.Services.Logging.csproj" />
+    <ProjectReference Include="..\Sharing.Services.Log\Sharing.Services.Logging.csproj" />
   </ItemGroup>
 
 </Project>

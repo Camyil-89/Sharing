@@ -42,6 +42,8 @@ namespace Sharing
 			services.AddSingleton<Services.Settings>();
 
 			services.AddSingleton<ViewModels.Windows.Main.MainWindowVM>();
+			services.AddSingleton<ViewModels.Pages.Dowload.DowloadPageVM>();
+			services.AddSingleton<ViewModels.Pages.Sharing.SharingPageVM>();
 
 			services.AddSingleton<Views.Pages.Sharing.SharingPage>();
 			services.AddSingleton<Views.Pages.Dowload.DowloadPage>();

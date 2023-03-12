@@ -6,9 +6,10 @@
       xmlns:local="clr-namespace:Sharing.Views.Pages.Dowload"
       mc:Ignorable="d" 
       d:DesignHeight="450" d:DesignWidth="800"
+	  DataContext="{Binding DowloadPageVM,Source={StaticResource Locator}}"
       Title="DowloadPage">
 
-    <Grid>
-		<Button Background="Green" Width="100"/>
+	<Grid>
+		<Button Background="Green" Width="100" Command="{Binding StartServerCommand}"/>
 	</Grid>
 </Page>

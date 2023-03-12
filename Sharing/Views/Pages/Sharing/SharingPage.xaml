@@ -6,9 +6,10 @@
       xmlns:local="clr-namespace:Sharing.Views.Pages.Sharing"
       mc:Ignorable="d" 
       d:DesignHeight="450" d:DesignWidth="800"
+	  DataContext="{Binding SharingPageVM,Source={StaticResource Locator}}"
       Title="SharingPage">
 
-    <Grid>
-		<Button Width="100"/>
+	<Grid>
+		<Button Width="100" Command="{Binding StartClientCommand}"/>
 	</Grid>
 </Page>
