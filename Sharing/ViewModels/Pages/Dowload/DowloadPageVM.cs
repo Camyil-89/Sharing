@@ -61,7 +61,7 @@ namespace Sharing.ViewModels.Pages.Dowload
 		private void OnStartStopClientCommandExecuted(object e)
 		{
 			if (!Services.Net.Client.ClientProvider.IsActive)
-				Services.Net.Client.ClientProvider.Start(new System.Net.IPAddress(new byte[] {127, 0, 0, 1}), Settings.Instance.Parametrs.ConnectPortServer);
+				Services.Net.Client.ClientProvider.Start(new System.Net.IPAddress(Settings.Instance.Parametrs.ConnectAddressServer), Settings.Instance.Parametrs.ConnectPortServer);
 			else
 				Services.Net.Client.ClientProvider.Stop();
 		}
