@@ -11,7 +11,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sharing.Client", "Sharing.C
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sharing.Services.Logging", "Sharing.Services.Logging\Sharing.Services.Logging.csproj", "{87B296B0-9BD1-4FDE-BE0A-33022E93F2E6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sharing.API", "Sharing.API\Sharing.API.csproj", "{EF841EEC-5F30-48DB-9144-43D0DA006E26}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sharing.API", "Sharing.API\Sharing.API.csproj", "{EF841EEC-5F30-48DB-9144-43D0DA006E26}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sharing.Net.Find", "Sharing.Net.Find\Sharing.Net.Find.csproj", "{596AF121-A3E0-4BB0-8B13-DEBF7E960C9A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,6 +41,10 @@ Global
 		{EF841EEC-5F30-48DB-9144-43D0DA006E26}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EF841EEC-5F30-48DB-9144-43D0DA006E26}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EF841EEC-5F30-48DB-9144-43D0DA006E26}.Release|Any CPU.Build.0 = Release|Any CPU
+		{596AF121-A3E0-4BB0-8B13-DEBF7E960C9A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{596AF121-A3E0-4BB0-8B13-DEBF7E960C9A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{596AF121-A3E0-4BB0-8B13-DEBF7E960C9A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{596AF121-A3E0-4BB0-8B13-DEBF7E960C9A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

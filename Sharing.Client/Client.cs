@@ -21,59 +21,89 @@ namespace Sharing.Client
 		public int Ping { get; private set; } = -1;
 		public StatusClient Status { get; private set; } = StatusClient.Stop;
 
-		private DateTime PingDateTime;
 		private Dictionary<Guid, Packet> WaitPacket = new Dictionary<Guid, Packet>();
-		public bool Start(IPAddress IPAddress, int port)
+
+		public int TimeoutWaitPacket = 2000;
+		public int TimeoutPing = 1000;
+		public ulong BufferSize = 2048;
+
+		public IPAddress IPAddress;
+		public int Port;
+
+		private EndPoint RemoteEndPoint;
+
+		public delegate void CallBackPacketFunc(Packet packet);
+		public CallBackPacketFunc CallBackPacket = null;
+
+		public bool Connected()
+		{
+			if (_Client == null)
+				return false;
+			return _Client.Connected;
+		}
+
+		public bool Start(IPAddress adress, int port)
 		{
 			if (Status != StatusClient.Stop)
 				return false;
-			Log.WriteLine("Start client", LogLevel.Warning);
-			Status = StatusClient.Work;
 			_Client = new TcpClient();
+			IPAddress = adress;
+			Port = port;
 			try
 			{
 				_Client.Connect(IPAddress, port);
+				RemoteEndPoint = _Client.Client.RemoteEndPoint;
 			}
 			catch { return false; }
-			Task.Run(() =>
-			{
-				StartListen();
-			});
+			Log.WriteLine("Start client", LogLevel.Warning);
+			Status = StatusClient.Work;
+			SendPacket(new Packet() { Type = TypePacket.SendFilesTree });
+			Task.Run(HandlerClient);
+			Task.Run(HandlerInternalRequest);
 			return true;
 		}
-		private void StartListen()
+		private void HandlerInternalRequest()
 		{
-			NetworkStream networkStream = _Client.GetStream();
-
-			Task.Run(() =>
-			{
-				Stopwatch stopwatch_ping = Stopwatch.StartNew();
-				while (_Client.Connected && Status == StatusClient.Work)
-				{
-					try
-					{
-						if (stopwatch_ping.ElapsedMilliseconds >= 1000)
-						{
-							var x = SendAndWaitResponse(new Packet() { Type = TypePacket.Ping, Data = DateTime.Now });
-							stopwatch_ping.Restart();
-						}
-					}
-					catch { }
-				}
-			});
+			Log.WriteLine($"[Client] [HandlerInternalRequest {RemoteEndPoint}] connect", LogLevel.Warning);
+			Stopwatch stopwatch_ping = Stopwatch.StartNew();
 			while (_Client.Connected && Status == StatusClient.Work)
 			{
 				try
 				{
-					byte[] myReadBuffer = new byte[2048];
+					if (stopwatch_ping.ElapsedMilliseconds >= TimeoutPing)
+					{
+						var x = SendAndWaitResponse(new Packet() { Type = TypePacket.Ping, Data = DateTime.Now });
+						Ping = (int)(DateTime.Now - (DateTime)x.Data).TotalMilliseconds;
+						stopwatch_ping.Restart();
+					}
+				}
+				catch { }
+				Thread.Sleep(16);
+			}
+			Status = StatusClient.Stop;
+			Log.WriteLine($"[Client] [HandlerInternalRequest {RemoteEndPoint}] disconnect", LogLevel.Warning);
+		}
+		private void HandlerClient()
+		{
+			Log.WriteLine($"[Client] [HandlerClient {RemoteEndPoint}] connect", LogLevel.Warning);
+			NetworkStream networkStream = _Client.GetStream();
+			while (_Client.Connected && Status == StatusClient.Work)
+			{
+				try
+				{
 					List<byte> allData = new List<byte>();
-					int numBytesRead = networkStream.Read(myReadBuffer, 0, myReadBuffer.Length);
-					if (numBytesRead == myReadBuffer.Length) allData.AddRange(myReadBuffer);
-					else if (numBytesRead > 0) allData.AddRange(myReadBuffer.Take(numBytesRead));
+					do
+					{
+						byte[] myReadBuffer = new byte[BufferSize];
+						int numBytesRead = networkStream.Read(myReadBuffer, 0, myReadBuffer.Length);
+						if (numBytesRead == myReadBuffer.Length) allData.AddRange(myReadBuffer);
+						else if (numBytesRead > 0) allData.AddRange(myReadBuffer.Take(numBytesRead));
+					} while (networkStream.DataAvailable);
+					
 
 					Packet packet = Packet.FromByteArray(allData.ToArray());
 
-					Console.WriteLine($"[CLIENT] {packet}");
+					//Console.WriteLine($"[CLIENT] {packet}");
 
 					if (WaitPacket.ContainsKey(packet.UID))
 					{
@@ -87,6 +117,7 @@ namespace Sharing.Client
 						case TypePacket.SendFile:
 							break;
 						case TypePacket.SendFilesTree:
+							SendCallBack(packet);
 							break;
 						case TypePacket.Ping:
 							SendPacket(packet);
@@ -95,9 +126,16 @@ namespace Sharing.Client
 				}
 				catch (Exception ex)
 				{
-					Console.WriteLine(ex);
+					
 				}
 			}
+			Status = StatusClient.Stop;
+			Log.WriteLine($"[Client] [HandlerClient {RemoteEndPoint}] disconnect", LogLevel.Warning);
+		}
+		private void SendCallBack(Packet packet)
+		{
+			if (CallBackPacket != null)
+				CallBackPacket.Invoke(packet);
 		}
 		public Packet SendAndWaitResponse(Packet packet)
 		{
@@ -106,8 +144,8 @@ namespace Sharing.Client
 			Stopwatch stopwatch = Stopwatch.StartNew();
 			while (WaitPacket[packet.UID] == null)
 			{
-				if (stopwatch.ElapsedMilliseconds > 2000)
-					throw new Exception("Timeout");
+				if (stopwatch.ElapsedMilliseconds > TimeoutWaitPacket)
+					throw new Exception($"Timeout: {stopwatch.ElapsedMilliseconds}\\{TimeoutWaitPacket}");
 			}
 
 			return WaitPacket[packet.UID];
@@ -127,7 +165,15 @@ namespace Sharing.Client
 		{
 			Log.WriteLine("Stop client", LogLevel.Warning);
 			Status = StatusClient.Stop;
+			if (_Client != null)
+			{
+				_Client.Close();
+				_Client.Dispose();
+			}
 		}
-
+		~Client()
+		{
+			Stop();
+		}
 	}
 }

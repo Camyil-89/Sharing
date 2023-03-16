@@ -11,7 +11,7 @@ namespace Sharing.ViewModels
 	{
 		public Windows.Main.MainWindowVM MainWindowVM => App.Host.Services.GetRequiredService<Windows.Main.MainWindowVM>();
 		public Pages.Dowload.DowloadPageVM DowloadPageVM => App.Host.Services.GetRequiredService<Pages.Dowload.DowloadPageVM>();
-		public Pages.Sharing.SharingPageVM SharingPageVM => App.Host.Services.GetRequiredService<Pages.Sharing.SharingPageVM>();
+		public Pages.SharingVM.SharingPageVM SharingPageVM => App.Host.Services.GetRequiredService<Pages.SharingVM.SharingPageVM>();
 
 
 		public Views.Pages.Sharing.SharingPage SharingPage => App.Host.Services.GetRequiredService<Views.Pages.Sharing.SharingPage>();

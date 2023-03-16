@@ -4,12 +4,83 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:local="clr-namespace:Sharing.Views.Pages.Sharing"
+      xmlns:CUI="clr-namespace:Sharing.CustomUI"
       mc:Ignorable="d" 
       d:DesignHeight="450" d:DesignWidth="800"
 	  DataContext="{Binding SharingPageVM,Source={StaticResource Locator}}"
       Title="SharingPage">
 
 	<Grid>
-		<Button Width="100" Command="{Binding StartClientCommand}"/>
+		<Grid.RowDefinitions>
+			<RowDefinition Height="40"/>
+			<RowDefinition/>
+		</Grid.RowDefinitions>
+		<StackPanel Orientation="Horizontal" Grid.Row="0" Margin="5 5 0 0">
+			<Button Style="{StaticResource LeftMenuButton}" Content="{Binding StartStopButtonText}" Command="{Binding StartStopServerCommand}" Height="30"/>
+		</StackPanel>
+		<TabControl Grid.Row="1">
+			<TabItem Header="Клиенты">
+				<ListView ItemsSource="{Binding Clients}">
+					<ListView.ItemTemplate>
+						<DataTemplate>
+							<StackPanel Orientation="Horizontal">
+								<TextBlock Text="{Binding StringFormat=IP: {0},Path=IPaddress}" Margin="0 0 25 0"/>
+								<TextBlock Text="{Binding StringFormat=Порт: {0},Path=Port}" Margin="0 0 25 0"/>
+								<TextBlock Text="{Binding StringFormat=Пинг: {0},Path=Ping}" Margin="0 0 25 0"/>
+								<TextBlock Text="{Binding StringFormat=Время подключения: {0},Path=TimeConnect}" Margin="0 0 25 0"/>
+							</StackPanel>
+						</DataTemplate>
+					</ListView.ItemTemplate>
+				</ListView>
+			</TabItem>
+			<TabItem Header="Файлы">
+				<Grid>
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition/>
+						<ColumnDefinition/>
+					</Grid.ColumnDefinitions>
+					<ListView Grid.Column="0" ItemsSource="{Binding Settings.Parametrs.SharingFilesAndFolders}" SelectedItem="{Binding SelectedPath}">
+						<ListView.ItemTemplate>
+							<DataTemplate>
+								<StackPanel Orientation="Horizontal">
+									<CUI:ToolTipTextBlock Text="{Binding }" Width="250" TextTrimming="CharacterEllipsis" ToolTipService.ToolTip="{Binding }"/>
+								</StackPanel>
+							</DataTemplate>
+						</ListView.ItemTemplate>
+					</ListView>
+					<StackPanel Orientation="Vertical" Grid.Column="1" HorizontalAlignment="Left" Margin="5">
+						<Button Style="{StaticResource LeftMenuButton}" Content="Добавить файл"
+								Command="{Binding AddNewFileCommand}" Margin="0 0 0 5"/>
+						<Button Style="{StaticResource LeftMenuButton}" Content="Добавить папку"
+								Command="{Binding AddNewFolderCommand}" Margin="0 0 0 5"/>
+						<Button Style="{StaticResource LeftMenuButton}" Content="Удалить" Command="{Binding RemoveFolderOrFileCommand}"/>
+					</StackPanel>
+				</Grid>
+			</TabItem>
+			<TabItem Header="Настройки">
+				<Grid>
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition/>
+						<ColumnDefinition/>
+					</Grid.ColumnDefinitions>
+					<StackPanel Orientation="Vertical" Grid.Row="0">
+						<GroupBox Header="Подключение">
+							<Grid>
+								<Grid.ColumnDefinitions>
+									<ColumnDefinition/>
+									<ColumnDefinition/>
+								</Grid.ColumnDefinitions>
+								<Grid.RowDefinitions>
+									<RowDefinition/>
+									<RowDefinition/>
+								</Grid.RowDefinitions>
+								<TextBlock Text="Порт подключения" Grid.Row="0"/>
+								<TextBox Text="{Binding Settings.Parametrs.ServerPort}" Grid.Column="1" Grid.Row="0"/>
+							</Grid>
+						</GroupBox>
+					</StackPanel>
+				</Grid>
+			</TabItem>
+		</TabControl>
 	</Grid>
 </Page>

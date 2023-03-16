@@ -10,6 +10,15 @@
       Title="DowloadPage">
 
 	<Grid>
-		<Button Background="Green" Width="100" Command="{Binding StartServerCommand}"/>
+		<Grid.RowDefinitions>
+			<RowDefinition Height="40"/>
+			<RowDefinition/>
+		</Grid.RowDefinitions>
+		<StackPanel Orientation="Horizontal" Grid.Row="0" Margin="5 5 0 0">
+			<Button Style="{StaticResource LeftMenuButton}" Content="{Binding StartStopButtonText}" Command="{Binding StartStopClientCommand}" IsEnabled="{Binding ActiveStartStopButton}" Height="30"/>
+		</StackPanel>
+		<TreeView Grid.Row="1" ItemsSource="{Binding ListNodes}" FontSize="14">
+
+		</TreeView>
 	</Grid>
 </Page>

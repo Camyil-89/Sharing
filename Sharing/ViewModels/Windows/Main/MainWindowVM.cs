@@ -1,10 +1,12 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Sharing.Base.Command;
+using Sharing.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 
@@ -20,6 +22,7 @@ namespace Sharing.ViewModels.Windows.Main
 		}
 
 		#region Parametrs
+		public Settings Settings => Settings.Instance;
 
 		#region FocusSharingMenu: Description
 		/// <summary>Description</summary>
@@ -53,6 +56,22 @@ namespace Sharing.ViewModels.Windows.Main
 		#endregion
 		#endregion
 
+
+		#region IPaddressServer: Description
+		/// <summary>Description</summary>
+		private string _IPaddressServer = "";
+		/// <summary>Description</summary>
+		public string IPaddressServer { get => _IPaddressServer; set => Set(ref _IPaddressServer, value); }
+		#endregion
+
+
+		#region VisibilityServerStatus: Description
+		/// <summary>Description</summary>
+		private Visibility _VisibilityServerStatus = Visibility.Collapsed;
+		/// <summary>Description</summary>
+		public Visibility VisibilityServerStatus { get => _VisibilityServerStatus; set => Set(ref _VisibilityServerStatus, value); }
+		#endregion
+
 		#region Commands
 
 		#region OpenMenuCommand: Description
@@ -72,6 +91,7 @@ namespace Sharing.ViewModels.Windows.Main
 			SelectedPage = page;
 
 			FocusSharingMenu = SelectedPage.Equals(App.Host.Services.GetRequiredService<Views.Pages.Sharing.SharingPage>()) == true ? "focus": "";
+			FocusDowloadMenu = SelectedPage.Equals(App.Host.Services.GetRequiredService<Views.Pages.Dowload.DowloadPage>()) == true ? "focus": "";
 		}
 		#endregion
 	}

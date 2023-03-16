@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 
@@ -21,12 +22,18 @@ namespace Sharing
 			var app = new App();
 			app.InitializeComponent();
 			app.Exit += App_Exit;
+			app.DispatcherUnhandledException += App_DispatcherUnhandledException;
 
 
 			LoadSettings();
-
 			app.Run();
-			
+
+		}
+
+		private static void App_DispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)
+		{
+			MessageBoxHelper.ErrorShow(e.Exception.ToString());
+			Log.WriteError(e.Exception);
 		}
 
 		private static void App_Exit(object sender, ExitEventArgs e)
@@ -41,10 +48,13 @@ namespace Sharing
 				Settings.Instance.Parametrs = XMLProvider.Load<Models.Parametrs>($"{Directory.GetCurrentDirectory()}\\Settings.xml");
 			}
 			catch { }
+
+			Sharing.Services.Net.Server.ServerProvider.Init();
+			Sharing.Services.Net.Client.ClientProvider.Init();
 		}
-		private static void SaveSettings()
+		public static void SaveSettings()
 		{
-			XMLProvider.Save<Models.Parametrs>($"{Directory.GetCurrentDirectory()}\\Settings.xml", Settings.Instance);
+			XMLProvider.Save<Models.Parametrs>($"{Directory.GetCurrentDirectory()}\\Settings.xml", Settings.Instance.Parametrs);
 		}
 		public static IHostBuilder CreateHostBuilder(string[] args)
 		{

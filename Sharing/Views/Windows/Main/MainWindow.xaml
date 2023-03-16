@@ -15,7 +15,13 @@
 		Width="800">
 	<DockPanel>
 		<StatusBar DockPanel.Dock="Bottom" Height="25">
-
+			<StackPanel Orientation="Horizontal" Visibility="{Binding VisibilityServerStatus}">
+				<StackPanel Orientation="Horizontal">
+					<TextBlock Text="{Binding StringFormat=IP сервера: {0}, Path=IPaddressServer}"/>
+					<TextBlock Text=" | "/>
+					<TextBlock Text="{Binding StringFormat=Порт сервера: {0}, Path=Settings.Parametrs.ServerPort}"/>
+				</StackPanel>
+			</StackPanel>
 		</StatusBar>
 		<Grid>
 			<Grid.ColumnDefinitions>
