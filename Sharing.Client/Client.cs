@@ -35,6 +35,8 @@ namespace Sharing.Client
 		public delegate void CallBackPacketFunc(Packet packet);
 		public CallBackPacketFunc CallBackPacket = null;
 
+		private PacketSender PacketSender;
+
 		public bool Connected()
 		{
 			if (_Client == null)
@@ -53,6 +55,7 @@ namespace Sharing.Client
 			{
 				_Client.Connect(IPAddress, port);
 				RemoteEndPoint = _Client.Client.RemoteEndPoint;
+				PacketSender = new PacketSender(_Client);
 			}
 			catch { return false; }
 			Log.WriteLine("Start client", LogLevel.Warning);
@@ -60,7 +63,19 @@ namespace Sharing.Client
 			SendPacket(new Packet() { Type = TypePacket.SendFilesTree });
 			Task.Run(HandlerClient);
 			Task.Run(HandlerInternalRequest);
+			Task.Run(HandleSender);
 			return true;
+		}
+		private void HandleSender()
+		{
+			while (_Client.Connected)
+			{
+				try
+				{
+					PacketSender.Loop();
+				}
+				catch (Exception ex) { Log.WriteLine(ex, LogLevel.Error); }
+			}
 		}
 		private void HandlerInternalRequest()
 		{
@@ -77,8 +92,8 @@ namespace Sharing.Client
 						stopwatch_ping.Restart();
 					}
 				}
-				catch { }
-				Thread.Sleep(16);
+				catch (Exception ex) { Log.WriteLine(ex, LogLevel.Error); }
+				Thread.Sleep(1);
 			}
 			Status = StatusClient.Stop;
 			Log.WriteLine($"[Client] [HandlerInternalRequest {RemoteEndPoint}] disconnect", LogLevel.Warning);
@@ -158,7 +173,7 @@ namespace Sharing.Client
 		{
 			if (_Client.Connected && Status == StatusClient.Work)
 			{
-				_Client.Client.Send(bytes);
+				PacketSender.Send(bytes);
 			}
 		}
 		public void Stop()

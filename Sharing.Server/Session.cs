@@ -29,8 +29,10 @@ namespace Sharing.Server
 		public int PortClient;
 		public IPAddress IPClient;
 
+		private PacketSender PacketSender;
 		public Session(TcpClient client)
 		{
+			PacketSender = new PacketSender(client);
 			Client = client;
 			RemoteEndPoint = Client.Client.RemoteEndPoint;
 			networkStream = Client.GetStream();
@@ -41,21 +43,37 @@ namespace Sharing.Server
 			TimeConnect = DateTime.Now;
 			Task.Run(HandleClient);
 			Task.Run(HandleInternalRequest);
+			Task.Run(HandleSender);
 		}
 
+		private void HandleSender()
+		{
+			while (Client.Connected)
+			{
+				try
+				{
+					PacketSender.Loop();
+				}
+				catch (Exception ex) { Log.WriteLine(ex, LogLevel.Error); }
+			}
+		}
 		private void HandleInternalRequest()
 		{
 			Log.WriteLine($"[HandleInternalRequest {RemoteEndPoint}] connect", LogLevel.Warning);
 			Stopwatch stopwatch_ping = Stopwatch.StartNew();
 			while (Client.Connected)
 			{
-				if (stopwatch_ping.ElapsedMilliseconds >= TimeoutPing)
+				try
 				{
-					var x = SendAndWaitResponse(new Packet() { Type = TypePacket.Ping, Data = DateTime.Now });
-					Ping = (int)(DateTime.Now - (DateTime)x.Data).TotalMilliseconds;
-					stopwatch_ping.Restart();
+					if (stopwatch_ping.ElapsedMilliseconds >= TimeoutPing)
+					{
+						var x = SendAndWaitResponse(new Packet() { Type = TypePacket.Ping, Data = DateTime.Now });
+						Ping = (int)(DateTime.Now - (DateTime)x.Data).TotalMilliseconds;
+						stopwatch_ping.Restart();
+					}
 				}
-				Thread.Sleep(16);
+				catch (Exception ex) { Log.WriteLine(ex, LogLevel.Error); }
+				Thread.Sleep(1);
 			}
 
 			Log.WriteLine($"[HandleInternalRequest {RemoteEndPoint}] disconnect", LogLevel.Warning);
@@ -129,8 +147,7 @@ namespace Sharing.Server
 		{
 			if (Client != null && Client.Connected)
 			{
-				Log.WriteLine($"bytes send: {data.Length}", LogLevel.Error);
-				Client.Client.Send(data);
+				PacketSender.Send(data);
 			}
 			else
 				throw new Exception("Нет соединения с клиентом");
