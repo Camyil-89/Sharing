@@ -61,36 +61,52 @@ namespace Sharing.Services.Net.Server
 			}
 			Log.WriteLine("[Server] [Loop] stop", LogLevel.Warning);
 		}
-		public static void Start(int port)
+		//public static void Start(int port)
+		//{
+		//	if (Server != null)
+		//	{
+		//		Server.Stop();
+		//		Server = new Sharing.Server.Server();
+		//	}
+		//	Server = new Sharing.Server.Server();
+		//	Server.Start(port);
+		//	//NetFindServer = new NetFind.Server();
+		//	//Task.Run(() => { NetFindServer.Start(Settings.Instance.Parametrs.NetFindServerPort, "Sharing", port); });
+		//	Task.Run(Loop);
+		//	MainWindowVM.VisibilityServerStatus = System.Windows.Visibility.Visible;
+		//	SharingPageVM.StartStopButtonText = "Остановить";
+		//}
+		//public static void Stop()
+		//{
+		//	NetFindServer.Stop();
+		//	Server.Stop();
+		//	Server = null;
+		//	SharingPageVM.StartStopButtonText = "Запустить";
+		//	MainWindowVM.VisibilityServerStatus = System.Windows.Visibility.Collapsed;
+		//	SharingPageVM.Clients.Clear();
+		//}
+
+		public static void Stop()
 		{
-			if (Server != null)
-			{
-				Server.Stop();
-				Server = new Sharing.Server.Server();
-			}
-			Server = new Sharing.Server.Server();
-			Server.Start(port);
-			//NetFindServer = new NetFind.Server();
-			//Task.Run(() => { NetFindServer.Start(Settings.Instance.Parametrs.NetFindServerPort, "Sharing", port); });
-			Task.Run(Loop);
+			Http.Server.Services.Server.Stop();
+			MainWindowVM.VisibilityServerStatus = System.Windows.Visibility.Collapsed;
+			SharingPageVM.StartStopButtonText = "Запустить";
+		}
+		public static void Start()
+		{
+			Http.Server.Services.Server.Start(new string[] { "--urls", "http://192.168.1.65:5001;https://192.168.1.65:5002" });
 			MainWindowVM.VisibilityServerStatus = System.Windows.Visibility.Visible;
 			SharingPageVM.StartStopButtonText = "Остановить";
 		}
-		public static void Stop()
-		{
-			NetFindServer.Stop();
-			Server.Stop();
-			Server = null;
-			SharingPageVM.StartStopButtonText = "Запустить";
-			MainWindowVM.VisibilityServerStatus = System.Windows.Visibility.Collapsed;
-			SharingPageVM.Clients.Clear();
-		}
-
 		public static Sharing.Server.StatusServer GetStatusServer()
 		{
-			if (Server != null)
-				return Server.Status;
-			return Sharing.Server.StatusServer.Stop;
+			return Http.Server.Services.Server.IsStarted ? Sharing.Server.StatusServer.Started : Sharing.Server.StatusServer.Stop;
 		}
+		//public static Sharing.Server.StatusServer GetStatusServer()
+		//{
+		//	if (Server != null)
+		//		return Server.Status;
+		//	return Sharing.Server.StatusServer.Stop;
+		//}
 	}
 }

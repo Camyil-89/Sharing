@@ -96,8 +96,13 @@ namespace Sharing.ViewModels.Pages.SharingVM
 		private bool CanStartStopServerCommandExecute(object e) => true;
 		private void OnStartStopServerCommandExecuted(object e)
 		{
+			//if (Services.Net.Server.ServerProvider.GetStatusServer() == Sharing.Server.StatusServer.Stop)
+			//	Services.Net.Server.ServerProvider.Start(Services.Settings.Instance.Parametrs.ServerPort);
+			//else
+			//	Services.Net.Server.ServerProvider.Stop();
+
 			if (Services.Net.Server.ServerProvider.GetStatusServer() == Sharing.Server.StatusServer.Stop)
-				Services.Net.Server.ServerProvider.Start(Services.Settings.Instance.Parametrs.ServerPort);
+				Services.Net.Server.ServerProvider.Start();
 			else
 				Services.Net.Server.ServerProvider.Stop();
 		}
