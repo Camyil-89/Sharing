@@ -1,8 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.NetworkInformation;
+using System.Net.Sockets;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using Sharing.API.Models;
 
 namespace Sharing.API
 {
@@ -10,7 +14,8 @@ namespace Sharing.API
 	public class ItemTree
 	{
 		public string Name { get; set; }
-		public string UID { get; set; }
+		public string Path { get; set; }
+		public string UID_ROOT { get; set; }
 
 		public long Size { get; set; } = 0;
 		public bool IsFolder { get; set; } = false;
@@ -19,6 +24,27 @@ namespace Sharing.API
 	}
 	public static class Utilities
 	{
+		public static List<UnicastIPAddressInformation> GetLocalIPAddresses()
+		{
+			NetworkInterface[] interfaces = NetworkInterface.GetAllNetworkInterfaces();
+			List<UnicastIPAddressInformation> addresses = new List<UnicastIPAddressInformation>();
+			foreach (NetworkInterface ni in interfaces)
+			{
+				if (ni.NetworkInterfaceType == NetworkInterfaceType.Ethernet ||
+					ni.NetworkInterfaceType == NetworkInterfaceType.Wireless80211)
+				{
+					IPInterfaceProperties ipProps = ni.GetIPProperties();
+					foreach (UnicastIPAddressInformation addr in ipProps.UnicastAddresses)
+					{
+						if (addr.Address.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)
+						{
+							addresses.Add(addr);
+						}
+					}
+				}
+			}
+			return addresses;
+		}
 		public static string GetStringSha256Hash(string text)
 		{
 			if (String.IsNullOrEmpty(text))
@@ -31,12 +57,13 @@ namespace Sharing.API
 				return BitConverter.ToString(hash).Replace("-", String.Empty);
 			}
 		}
-		private static ItemTree CreateItem(string path)
+		private static ItemTree CreateItem(string path, string root_path)
 		{
 			ItemTree item = new ItemTree();
 			item.IsFolder = Directory.Exists(path);
 			item.Name = path.Split("\\").Last();
-			item.UID = GetStringSha256Hash(path);
+			item.Path = path.Replace(root_path, "");
+			item.UID_ROOT = GetStringSha256Hash(root_path);
 			if (!item.IsFolder)
 			{
 				FileInfo fileInfo = new FileInfo(path);
@@ -44,23 +71,23 @@ namespace Sharing.API
 			}
 			else
 			{
-				foreach (var i in Directory.GetFiles(path))
-				{
-					item.ItemsTrees.Add(CreateItem(i));
-				}
 				foreach (var i in Directory.GetDirectories(path))
 				{
-					item.ItemsTrees.Add(CreateItem(i));
+					item.ItemsTrees.Add(CreateItem(i, root_path));
+				}
+				foreach (var i in Directory.GetFiles(path))
+				{
+					item.ItemsTrees.Add(CreateItem(i, root_path));
 				}
 			}
 			return item;
 		}
-		public static List<ItemTree> CreateItemTree(List<string> items)
+		public static List<ItemTree> CreateItemTree(List<SharingFile> items)
 		{
 			List<ItemTree> list_itemTree = new List<ItemTree>();
-			foreach (var path in items)
+			foreach (var file in items)
 			{
-				list_itemTree.Add(CreateItem(path));
+				list_itemTree.Add(CreateItem(file.Path, file.Path));
 			}
 			return list_itemTree;
 		}

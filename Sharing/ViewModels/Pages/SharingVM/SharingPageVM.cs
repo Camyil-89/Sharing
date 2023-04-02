@@ -1,6 +1,7 @@
 ﻿using Microsoft.Win32;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using Microsoft.WindowsAPICodePack.Dialogs.Controls;
+using Sharing.API.Models;
 using Sharing.Base.Command;
 using Sharing.Services;
 using System;
@@ -78,9 +79,9 @@ namespace Sharing.ViewModels.Pages.SharingVM
 
 		#region SelectedPath: Description
 		/// <summary>Description</summary>
-		private string _SelectedPath;
+		private SharingFile _SelectedPath;
 		/// <summary>Description</summary>
-		public string SelectedPath { get => _SelectedPath; set => Set(ref _SelectedPath, value); }
+		public SharingFile SelectedPath { get => _SelectedPath; set => Set(ref _SelectedPath, value); }
 		#endregion
 
 		#endregion
@@ -111,10 +112,10 @@ namespace Sharing.ViewModels.Pages.SharingVM
 		#region RemoveFolderOrFileCommand: Description
 		private ICommand _RemoveFolderOrFileCommand;
 		public ICommand RemoveFolderOrFileCommand => _RemoveFolderOrFileCommand ??= new LambdaCommand(OnRemoveFolderOrFileCommandExecuted, CanRemoveFolderOrFileCommandExecute);
-		private bool CanRemoveFolderOrFileCommandExecute(object e) => !string.IsNullOrEmpty(SelectedPath);
+		private bool CanRemoveFolderOrFileCommandExecute(object e) => SelectedPath != null;
 		private void OnRemoveFolderOrFileCommandExecuted(object e)
 		{
-			Settings.Parametrs.SharingFilesAndFolders.Remove(SelectedPath);
+			Settings.RemoveSharingFile(SelectedPath);
 		}
 		#endregion
 		#region AddNewFileOrFolderCommand: Description
@@ -130,11 +131,10 @@ namespace Sharing.ViewModels.Pages.SharingVM
 			{
 				foreach (string file in openFileDialog.FileNames)
 				{
-					if (!Settings.Parametrs.SharingFilesAndFolders.Contains(file))
+					if (Settings.Parametrs.SharingFilesAndFolders.FirstOrDefault((i)=> i.Path == file) == null)
 					{
-						Settings.Parametrs.SharingFilesAndFolders.Add(file);
+						Settings.AddSharingFile(new SharingFile() { Path = file });
 					}
-					Console.WriteLine(file);
 				}
 			}
 		}
@@ -153,11 +153,10 @@ namespace Sharing.ViewModels.Pages.SharingVM
 			{
 				foreach (string file in dialog.FileNames)
 				{
-					if (!Settings.Parametrs.SharingFilesAndFolders.Contains(file))
+					if (Settings.Parametrs.SharingFilesAndFolders.FirstOrDefault((i) => i.Path == file) == null)
 					{
-						Settings.Parametrs.SharingFilesAndFolders.Add(file);
+						Settings.AddSharingFile(new SharingFile() { Path = file });
 					}
-					Console.WriteLine(file);
 				}
 			}
 		}

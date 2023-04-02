@@ -29,16 +29,16 @@ namespace Sharing.Server
 			SharingFolders = folders;
 			while (true)
 			{
-				try
-				{
-					var items_tree = Utilities.CreateItemTree(SharingFolders);
-					foreach (var i in Clients)
-					{
-						i.SendPacket(new Packet() { Data = items_tree, Type = TypePacket.SendFilesTree });
-					}
-					break;
-				}
-				catch { }
+				//try
+				//{
+				//	var items_tree = Utilities.CreateItemTree(SharingFolders);
+				//	foreach (var i in Clients)
+				//	{
+				//		i.SendPacket(new Packet() { Data = items_tree, Type = TypePacket.SendFilesTree });
+				//	}
+				//	break;
+				//}
+				//catch { }
 			}
 		}
 		public void Start(int port)

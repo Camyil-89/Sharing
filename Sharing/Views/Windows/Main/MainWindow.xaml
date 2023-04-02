@@ -17,9 +17,22 @@
 		<StatusBar DockPanel.Dock="Bottom" Height="25">
 			<StackPanel Orientation="Horizontal" Visibility="{Binding VisibilityServerStatus}">
 				<StackPanel Orientation="Horizontal">
+					<TextBlock Text="{Binding StringFormat=IP сервера: {0}, Path=IPaddressServer}" ToolTipService.InitialShowDelay="50">
+						<TextBlock.ToolTip>
+							<TextBlock Text="{Binding TextToolTipAllIPAddresses}"/>
+						</TextBlock.ToolTip>
+					</TextBlock>
+					<TextBlock Text=" | "/>
+					<TextBlock Text="{Binding StringFormat=Порт сервера: {0}, Path=Settings.Parametrs.ServerPort}"/>
+				</StackPanel>
+			</StackPanel>
+			<StackPanel Orientation="Horizontal" Visibility="{Binding VisibilityClientStatus}">
+				<StackPanel Orientation="Horizontal">
 					<TextBlock Text="{Binding StringFormat=IP сервера: {0}, Path=IPaddressServer}"/>
 					<TextBlock Text=" | "/>
 					<TextBlock Text="{Binding StringFormat=Порт сервера: {0}, Path=Settings.Parametrs.ServerPort}"/>
+					<TextBlock Text=" | "/>
+					<TextBlock Text="{Binding StringFormat=Пинг: {0}, Path=TextPing}"/>
 				</StackPanel>
 			</StackPanel>
 		</StatusBar>

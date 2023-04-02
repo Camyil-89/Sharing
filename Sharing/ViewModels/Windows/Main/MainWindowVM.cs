@@ -72,6 +72,28 @@ namespace Sharing.ViewModels.Windows.Main
 		public Visibility VisibilityServerStatus { get => _VisibilityServerStatus; set => Set(ref _VisibilityServerStatus, value); }
 		#endregion
 
+
+		#region VisibilityClientStatus: Description
+		/// <summary>Description</summary>
+		private Visibility _VisibilityClientStatus = Visibility.Collapsed;
+		/// <summary>Description</summary>
+		public Visibility VisibilityClientStatus { get => _VisibilityClientStatus; set => Set(ref _VisibilityClientStatus, value); }
+		#endregion
+
+
+		#region TextToolTipAllIPAddresses: Description
+		/// <summary>Description</summary>
+		private string _TextToolTipAllIPAddresses;
+		/// <summary>Description</summary>
+		public string TextToolTipAllIPAddresses { get => _TextToolTipAllIPAddresses; set => Set(ref _TextToolTipAllIPAddresses, value); }
+		#endregion
+
+		#region TextPing: Description
+		/// <summary>Description</summary>
+		private string _TextPing = "Нет подключения";
+		/// <summary>Description</summary>
+		public string TextPing { get => _TextPing; set => Set(ref _TextPing, value); }
+		#endregion
 		#region Commands
 
 		#region OpenMenuCommand: Description

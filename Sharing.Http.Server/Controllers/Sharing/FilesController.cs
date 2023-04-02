@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Sharing.API;
+using Sharing.Http.Server.Services;
 
 namespace Sharing.Http.Server.Controllers.Sharing
 {
@@ -8,9 +10,9 @@ namespace Sharing.Http.Server.Controllers.Sharing
 	{
 		[Route("api/sharing/files")]
 		[HttpGet]
-		public string Get()
+		public async Task<List<ItemTree>> GetFiles()
 		{
-			return "test";
+			return Utilities.CreateItemTree(Settings.SharingFiles);
 		}
 	}
 }

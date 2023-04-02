@@ -105,18 +105,18 @@ namespace Sharing.Server
 					}
 
 
-					switch (packet.Type)
-					{
-						case TypePacket.SendFile:
-							break;
-						case TypePacket.SendFilesTree:
-							var items_tree = Utilities.CreateItemTree(Server.SharingFolders);
-							SendPacket(new Packet() { Data = items_tree, Type = TypePacket.SendFilesTree });
-							break;
-						case TypePacket.Ping:
-							SendPacket(packet);
-							break;
-					}
+					//switch (packet.Type)
+					//{
+					//	case TypePacket.SendFile:
+					//		break;
+					//	case TypePacket.SendFilesTree:
+					//		var items_tree = Utilities.CreateItemTree(Server.SharingFolders);
+					//		SendPacket(new Packet() { Data = items_tree, Type = TypePacket.SendFilesTree });
+					//		break;
+					//	case TypePacket.Ping:
+					//		SendPacket(packet);
+					//		break;
+					//}
 				}
 				catch (Exception ex)
 				{

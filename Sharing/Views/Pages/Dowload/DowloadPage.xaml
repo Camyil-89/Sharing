@@ -2,6 +2,8 @@
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+		xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+		xmlns:vm="clr-namespace:Sharing.ViewModels.Pages.Dowload"
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:local="clr-namespace:Sharing.Views.Pages.Dowload"
       mc:Ignorable="d" 
@@ -18,7 +20,14 @@
 			<Button Style="{StaticResource LeftMenuButton}" Content="{Binding StartStopButtonText}" Command="{Binding StartStopClientCommand}" IsEnabled="{Binding ActiveStartStopButton}" Height="30"/>
 		</StackPanel>
 		<TreeView Grid.Row="1" ItemsSource="{Binding ListNodes}" FontSize="14">
-
+			<i:Interaction.Behaviors>
+				<vm:BindableSelectedItemBehavior SelectedItem="{Binding SelectedNode, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+			</i:Interaction.Behaviors>
+			<TreeView.ContextMenu>
+				<ContextMenu>
+					<MenuItem Header="Скачать" Command="{Binding DowloadNodeCommand}" CommandParameter="{Binding SelectedNode}"/>
+				</ContextMenu>
+			</TreeView.ContextMenu>
 		</TreeView>
 	</Grid>
 </Page>

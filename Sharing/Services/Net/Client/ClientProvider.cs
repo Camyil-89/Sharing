@@ -1,11 +1,20 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Sharing.API;
+using Sharing.Http.Client;
 using Sharing.ViewModels.Pages.Dowload;
+using Sharing.ViewModels.Windows.Main;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
+using System.Net.Http.Json;
+using System.Net.Mail;
+using System.Net.Sockets;
 using System.Text;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Controls;
@@ -15,23 +24,54 @@ namespace Sharing.Services.Net.Client
 	internal static class ClientProvider
 	{
 		private static ViewModels.Pages.Dowload.DowloadPageVM DowloadPageVM = App.Host.Services.GetRequiredService<ViewModels.Pages.Dowload.DowloadPageVM>();
-		private static Sharing.Client.Client Client;
-		private static NetFind.Client NetFindClient = new NetFind.Client();
+		private static ViewModels.Windows.Main.MainWindowVM MainWindowVM = App.Host.Services.GetRequiredService<MainWindowVM>();
 
-		private static bool IsCheckConnectToServer = false;
-		private static bool IsCheckConnectToServerNetFind = false;
+		private static Http.Client.Client HttpClient;
 
-		public static bool IsActive = false;
+
+		private static DateTime LastUpdateTree;
+
+		private static int Ping_Timeout = 1000;
 
 		public static void Init()
 		{
 
 		}
-
-		private static void HandlerPacketFromServer(Packet packet)
+		private static void InternalLoop()
 		{
+			Stopwatch stopwatch_ping = Stopwatch.StartNew();
+			while (HttpClient.Status == Http.Client.Status.OK)
+			{
+				try
+				{
+					if (stopwatch_ping.ElapsedMilliseconds >= Ping_Timeout)
+					{
+						stopwatch_ping.Restart();
+						DateTime time = DateTime.Now;
+						var last = HttpClient.Requests.LastUpdateTree();
+
+						if (last != LastUpdateTree)
+						{
+							UpdateTree();
+							LastUpdateTree = last;
+						}
+
+						MainWindowVM.TextPing = $"{Math.Round((DateTime.Now - time).TotalMilliseconds, 1)} мс";
+					}
+				}
+				catch (Exception ex)
+				{
+					Log.WriteLine(ex, LogLevel.Error);
+					break;
+				}
+			}
+			Stop();
+			MainWindowVM.TextPing = "Нет подключения";
+		}
+		private static void UpdateTree()
+		{
+			List<API.ItemTree> itemTrees = HttpClient.Requests.GetTree();
 			DowloadPageVM.ListNodes.Clear();
-			List<API.ItemTree> itemTrees = (List<API.ItemTree>)packet.Data;
 			TreeViewItem generateTreeView(ItemTree item)
 			{
 				TreeViewItem treeViewItem = new TreeViewItem();
@@ -54,122 +94,48 @@ namespace Sharing.Services.Net.Client
 				});
 			}
 		}
-
-		private static void CheckConnectToServer()
-		{
-			if (IsCheckConnectToServer)
-				return;
-			Log.WriteLine("[Client] [CheckConnectToServer] strart", LogLevel.Warning);
-			IsCheckConnectToServer = true;
-			while (Client != null && IsActive)
-			{
-				try
-				{
-					if (!Client.Connected() || Client.Status == Sharing.Client.StatusClient.Stop)
-					{
-						Client.Start(Client.IPAddress, Client.Port);
-					}
-				}
-				catch { }
-				Thread.Sleep(16);
-			}
-			IsCheckConnectToServer = false;
-			DowloadPageVM.ActiveStartStopButton = true;
-			Log.WriteLine("[Client] [CheckConnectToServer] stop", LogLevel.Warning);
-		}
-
-		//private static void CheckConnectToServerNetFind()
-		//{
-		//	if (IsCheckConnectToServerNetFind)
-		//		return;
-		//	Log.WriteLine("[Client] [CheckConnectToServerNetFind] strart", LogLevel.Warning);
-		//	IsCheckConnectToServerNetFind = true;
-		//	while (Client != null && IsActive)
-		//	{
-		//		try
-		//		{
-		//			Console.WriteLine(Client.Connected());
-		//			if (!Client.Connected() || Client.Status == Sharing.Client.StatusClient.Stop)
-		//			{
-		//				NetFindClient = new NetFind.Client();
-		//				var info = NetFindClient.StartFind(Settings.Instance.Parametrs.ClientNetFindServerPort, 3000, "Sharing");
-		//				if (info != null)
-		//					Client.Start(info.IPAddress, info.Port);
-		//			}
-		//		}
-		//		catch (Exception ex) { Console.WriteLine(ex); }
-		//		Thread.Sleep(16);
-		//	}
-		//	IsCheckConnectToServerNetFind = false;
-		//	DowloadPageVM.ActiveStartStopButton = true;
-		//	Log.WriteLine("[Client] [CheckConnectToServerNetFind] stop", LogLevel.Warning);
-		//}
-		//public static void Start()
-		//{
-		//	DowloadPageVM.ActiveStartStopButton = false;
-		//	if (Client != null)
-		//	{
-		//		Client.Stop();
-		//		Client = null;
-		//	}
-		//	NetFindClient = new NetFind.Client();
-		//  Client = new Sharing.Client.Client();
-		//	Client.CallBackPacket += HandlerPacketFromServer;
-		//	Task.Run(() =>
-		//	{
-		//		var info = NetFindClient.StartFind(Settings.Instance.Parametrs.ClientNetFindServerPort, 3000, "Sharing");
-		//		if (info != null)
-		//			Client.Start(info.IPAddress, info.Port);
-		//		DowloadPageVM.ActiveStartStopButton = true;
-		//		CheckConnectToServerNetFind();
-		//	});
-		//	IsActive = true;
-
-		//	DowloadPageVM.StartStopButtonText = "Отключиться";
-		//}
 		public static void Start(IPAddress address, int port)
 		{
-			DowloadPageVM.ActiveStartStopButton = false;
-			if (Client != null)
+			LastUpdateTree = DateTime.Now;
+			HttpClient = new Http.Client.Client();
+			if (!HttpClient.Connect($"http://{address}:{port}"))
 			{
-				Client.Stop();
-				Client = null;
+				Stop();
+				return;
 			}
-			Client = new Sharing.Client.Client();
-			Client.CallBackPacket += HandlerPacketFromServer;
-			Client.IPAddress = address;
-			Client.Port = port;
-			Task.Run(() =>
+			try
 			{
-				Client.Start(Client.IPAddress, Client.Port);
-				DowloadPageVM.ActiveStartStopButton = true;
-				CheckConnectToServer();
-			});
-			IsActive = true;
-
+				LastUpdateTree = HttpClient.Requests.LastUpdateTree();
+				UpdateTree();
+			}
+			catch
+			{
+				Stop();
+				return;
+			}
+			try
+			{
+				HttpClient.Requests.test();
+			}
+			catch (Exception ex) { Console.WriteLine(ex); }
+			Task.Run(InternalLoop);
+			MainWindowVM.VisibilityClientStatus = System.Windows.Visibility.Visible;
 			DowloadPageVM.StartStopButtonText = "Отключиться";
 		}
 		public static void Stop()
 		{
-			DowloadPageVM.ActiveStartStopButton = false;
-			IsActive = false;
+			HttpClient.Stop();
 
-			Task.Run(() =>
-			{
-				while (IsCheckConnectToServer)
-					Thread.Sleep(1);
-				Client.Stop();
-				Client = null;
-			});
+			MainWindowVM.VisibilityClientStatus = System.Windows.Visibility.Collapsed;
 			DowloadPageVM.ListNodes.Clear();
 			DowloadPageVM.StartStopButtonText = "Подключиться";
 		}
 
-		public static Sharing.Client.StatusClient GetStatus()
+		public static Sharing.Http.Client.Status GetStatus()
 		{
-			if (Client != null)
-				return Client.Status;
-			return Sharing.Client.StatusClient.Stop;
+			if (HttpClient == null)
+				return Http.Client.Status.Shutdown;
+			return HttpClient.Status;
 		}
 	}
 }

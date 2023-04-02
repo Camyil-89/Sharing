@@ -27,7 +27,7 @@ namespace Sharing
 
 			LoadSettings();
 			app.Run();
-
+			Services.Net.Server.ServerProvider.Stop();
 		}
 
 		private static void App_DispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)

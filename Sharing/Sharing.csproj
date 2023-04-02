@@ -11,23 +11,20 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Costura.Fody" Version="5.7.0">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.1" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="6.0.1" />
+    <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.39" />
     <PackageReference Include="System.Management" Version="6.0.0" />
     <PackageReference Include="WindowsAPICodePack-Shell" Version="1.1.1" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Sharing.Client\Sharing.Client.csproj" />
+    <ProjectReference Include="..\Sharing.http.Client\Sharing.Http.Client.csproj" />
     <ProjectReference Include="..\Sharing.Http.Server\Sharing.Http.Server.csproj" />
     <ProjectReference Include="..\Sharing.Net.Find\Sharing.Net.Find.csproj" />
     <ProjectReference Include="..\Sharing.Server\Sharing.Server.csproj" />
     <ProjectReference Include="..\Sharing.Services.Logging\Sharing.Services.Logging.csproj" />
-    <ProjectReference Include="..\Sharing.Services.Log\Sharing.Services.Logging.csproj" />
   </ItemGroup>
 
 </Project>

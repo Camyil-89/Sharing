@@ -1,9 +1,12 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Sharing.API;
+using Sharing.Http.Client;
 using Sharing.ViewModels.Pages.SharingVM;
 using Sharing.ViewModels.Windows.Main;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
@@ -15,92 +18,70 @@ namespace Sharing.Services.Net.Server
 {
 	internal static class ServerProvider
 	{
-		private static Sharing.Server.Server Server;
-		private static NetFind.Server NetFindServer = new NetFind.Server();
 		private static ViewModels.Pages.SharingVM.SharingPageVM SharingPageVM = App.Host.Services.GetRequiredService<ViewModels.Pages.SharingVM.SharingPageVM>();
 		private static ViewModels.Windows.Main.MainWindowVM MainWindowVM = App.Host.Services.GetRequiredService<MainWindowVM>();
 
+		private static Requests Requests;
+
 		public static void Init()
 		{
-			MainWindowVM.IPaddressServer = "127.0.0.1";
-		}
-		private static void Loop()
-		{
-			Log.WriteLine("[Server] [Loop] start", LogLevel.Warning);
-			Stopwatch update_list_clients = Stopwatch.StartNew();
-			while (Server != null)
-			{
-				try
-				{
-					if (update_list_clients.ElapsedMilliseconds >= 1000)
-					{
-						SharingPageVM.Clients.Clear();
+			var addresses = Utilities.GetLocalIPAddresses();
+			MainWindowVM.IPaddressServer = $"{addresses[0].Address}";
 
-						foreach (var i in Server.Clients)
-						{
-							ItemClient client = new ItemClient();
-							client.Port = i.PortClient;
-							client.IPaddress = i.IPClient;
-							client.Ping = i.Ping;
-							client.TimeConnect = $"{(DateTime.Now - i.TimeConnect).Hours}:{(DateTime.Now - i.TimeConnect).Minutes}:{(DateTime.Now - i.TimeConnect).Seconds}";
-							SharingPageVM.Clients.Add(client);
-						}
-						update_list_clients.Restart();
-					}
-					if (Settings.Instance.Parametrs.SharingFilesAndFolders.Count != Sharing.Server.Server.SharingFolders.Count)
-					{
-						Console.WriteLine("asd");
-						Server.SetSharingFolder(Settings.Instance.Parametrs.SharingFilesAndFolders.ToList());
-					}
-				}
-				catch (Exception ex)
-				{
-					Console.WriteLine(ex);
-				}
-				Thread.Sleep(100);
+			MainWindowVM.TextToolTipAllIPAddresses = "";
+			foreach (var i in addresses)
+			{
+				MainWindowVM.TextToolTipAllIPAddresses += $"{i.Address}\n";
 			}
-			Log.WriteLine("[Server] [Loop] stop", LogLevel.Warning);
+			MainWindowVM.TextToolTipAllIPAddresses = MainWindowVM.TextToolTipAllIPAddresses.Trim();
+
+			//File.WriteAllText($"{Environment.CurrentDirectory}\\secret_password.txt", $"{}");
 		}
-		//public static void Start(int port)
-		//{
-		//	if (Server != null)
-		//	{
-		//		Server.Stop();
-		//		Server = new Sharing.Server.Server();
-		//	}
-		//	Server = new Sharing.Server.Server();
-		//	Server.Start(port);
-		//	//NetFindServer = new NetFind.Server();
-		//	//Task.Run(() => { NetFindServer.Start(Settings.Instance.Parametrs.NetFindServerPort, "Sharing", port); });
-		//	Task.Run(Loop);
-		//	MainWindowVM.VisibilityServerStatus = System.Windows.Visibility.Visible;
-		//	SharingPageVM.StartStopButtonText = "Остановить";
-		//}
-		//public static void Stop()
-		//{
-		//	NetFindServer.Stop();
-		//	Server.Stop();
-		//	Server = null;
-		//	SharingPageVM.StartStopButtonText = "Запустить";
-		//	MainWindowVM.VisibilityServerStatus = System.Windows.Visibility.Collapsed;
-		//	SharingPageVM.Clients.Clear();
-		//}
 
 		public static void Stop()
 		{
-			Http.Server.Services.Server.Stop();
+			ServerProcess.Kill();
+			ServerProcess = null;
 			MainWindowVM.VisibilityServerStatus = System.Windows.Visibility.Collapsed;
 			SharingPageVM.StartStopButtonText = "Запустить";
 		}
+		static Process ServerProcess = null;
 		public static void Start()
 		{
-			Http.Server.Services.Server.Start(new string[] { "--urls", "http://192.168.1.65:5001;https://192.168.1.65:5002" });
+			ServerProcess = new Process();
+			ServerProcess.StartInfo = new ProcessStartInfo($"{Environment.CurrentDirectory}\\Sharing.Http.Server.exe", $"--urls http://[]:{Settings.Instance.Parametrs.ServerPort}");
+			ServerProcess.Start();
+			Task.Run(() =>
+			{
+				ServerProcess.WaitForExit();
+				Stop();
+
+			});
+			Requests = new Requests($"http://127.0.0.1:{Settings.Instance.Parametrs.ServerPort}");
+			SetSharingFolder();
+			//Http.Server.Services.Server.Start(new string[] { "--urls", $"http://[::]:{Settings.Instance.Parametrs.ServerPort}" });
 			MainWindowVM.VisibilityServerStatus = System.Windows.Visibility.Visible;
 			SharingPageVM.StartStopButtonText = "Остановить";
 		}
+
+		public static void SetSharingFolder()
+		{
+			if (GetStatusServer() != Sharing.Server.StatusServer.Started)
+				return;
+			try
+			{
+				Requests.SendPost("/api/settings/set_sharing", Settings.Instance.Parametrs.SharingFilesAndFolders);
+			}
+			catch (Exception ex)
+			{
+				Log.WriteLine(ex, LogLevel.Error);
+				Stop();
+			}
+		}
+
 		public static Sharing.Server.StatusServer GetStatusServer()
 		{
-			return Http.Server.Services.Server.IsStarted ? Sharing.Server.StatusServer.Started : Sharing.Server.StatusServer.Stop;
+			return ServerProcess == null ? Sharing.Server.StatusServer.Stop : Sharing.Server.StatusServer.Started;//Http.Server.Services.Server.IsStarted ? Sharing.Server.StatusServer.Started : Sharing.Server.StatusServer.Stop;
 		}
 		//public static Sharing.Server.StatusServer GetStatusServer()
 		//{

@@ -15,24 +15,24 @@ namespace Sharing.Http.Server.Services
 			builder.Services.AddControllers();
 			// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 			builder.Services.AddEndpointsApiExplorer();
-			builder.Services.AddSwaggerGen();
+			//builder.Services.AddSwaggerGen();
 
 			WebApplication = builder.Build();
 
 			// Configure the HTTP request pipeline.
-			if (WebApplication.Environment.IsDevelopment())
-			{
-				WebApplication.UseSwagger();
-				WebApplication.UseSwaggerUI();
-			}
+			//if (WebApplication.Environment.IsDevelopment())
+			//{
+			//	WebApplication.UseSwagger();
+			//	WebApplication.UseSwaggerUI();
+			//}
 
-			WebApplication.UseHttpsRedirection();
+			//WebApplication.UseHttpsRedirection();
 
 			WebApplication.UseAuthorization();
 
 			WebApplication.MapControllers();
 
-			Task.Run(() =>
+			Thread thread = new Thread(() =>
 			{
 				try
 				{
@@ -43,7 +43,9 @@ namespace Sharing.Http.Server.Services
 					Log.WriteLine("HttpServer: stop");
 				}
 				catch (Exception ex) { IsStarted = false; Log.WriteLine(ex, Sharing.Services.LogLevel.Error); }
+
 			});
+			thread.Start();
 		}
 		public static void Stop()
 		{

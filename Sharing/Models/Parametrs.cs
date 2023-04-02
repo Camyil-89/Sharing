@@ -29,20 +29,12 @@ namespace Sharing.Models
 		#endregion
 
 
-		#region NetFindServerPort: Description
+		#region ServerIPaddress: Description
 		/// <summary>Description</summary>
-		private int _NetFindServerPort = 3010;
+		private byte[] _ServerIPaddress = new byte[] { 127, 0, 0, 1};
 		/// <summary>Description</summary>
-		public int NetFindServerPort { get => _NetFindServerPort; set => Set(ref _NetFindServerPort, value); }
+		public byte[] ServerIPaddress { get => _ServerIPaddress; set => Set(ref _ServerIPaddress, value); }
 		#endregion
-
-		#region ClientNetFindServerPort: Description
-		/// <summary>Description</summary>
-		private int _ClientNetFindServerPort = 3010;
-		/// <summary>Description</summary>
-		public int ClientNetFindServerPort { get => _ClientNetFindServerPort; set => Set(ref _ClientNetFindServerPort, value); }
-		#endregion
-
 
 		#region ConnectAddressServer: Description
 		/// <summary>Description</summary>
@@ -71,11 +63,11 @@ namespace Sharing.Models
 		#endregion
 
 
-		#region SharingFilesAndFolders: Description
+		#region SharingFilesAndFolders: Description	
 		/// <summary>Description</summary>
-		private ObservableCollection<string> _SharingFilesAndFolders = new ObservableCollection<string>();
+		private ObservableCollection<API.Models.SharingFile> _SharingFilesAndFolders = new ObservableCollection<API.Models.SharingFile>();
 		/// <summary>Description</summary>
-		public ObservableCollection<string> SharingFilesAndFolders { get => _SharingFilesAndFolders; set => Set(ref _SharingFilesAndFolders, value); }
+		public ObservableCollection<API.Models.SharingFile> SharingFilesAndFolders { get => _SharingFilesAndFolders; set => Set(ref _SharingFilesAndFolders, value); }
 		#endregion
 	}
 }
