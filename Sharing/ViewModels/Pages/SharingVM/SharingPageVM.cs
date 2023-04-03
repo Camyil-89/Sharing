@@ -102,7 +102,7 @@ namespace Sharing.ViewModels.Pages.SharingVM
 			//else
 			//	Services.Net.Server.ServerProvider.Stop();
 
-			if (Services.Net.Server.ServerProvider.GetStatusServer() == Sharing.Server.StatusServer.Stop)
+			if (Services.Net.Server.ServerProvider.GetStatusServer() == Services.Net.Server.StatusServer.Shutdown)
 				Services.Net.Server.ServerProvider.Start();
 			else
 				Services.Net.Server.ServerProvider.Stop();

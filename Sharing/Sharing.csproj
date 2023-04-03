@@ -19,11 +19,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Sharing.Client\Sharing.Client.csproj" />
     <ProjectReference Include="..\Sharing.http.Client\Sharing.Http.Client.csproj" />
     <ProjectReference Include="..\Sharing.Http.Server\Sharing.Http.Server.csproj" />
-    <ProjectReference Include="..\Sharing.Net.Find\Sharing.Net.Find.csproj" />
-    <ProjectReference Include="..\Sharing.Server\Sharing.Server.csproj" />
     <ProjectReference Include="..\Sharing.Services.Logging\Sharing.Services.Logging.csproj" />
   </ItemGroup>
 

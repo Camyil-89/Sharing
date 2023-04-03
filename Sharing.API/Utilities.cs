@@ -57,6 +57,36 @@ namespace Sharing.API
 				return BitConverter.ToString(hash).Replace("-", String.Empty);
 			}
 		}
+		public static string GetSharingFilePath(List<SharingFile> sharings, RequestFileInfo requestFile)
+		{
+			foreach (var i in sharings)
+			{
+				if (string.IsNullOrEmpty(requestFile.Path))
+				{
+					if (GetStringSha256Hash(i.Path) == requestFile.UID_ROOT)
+					{
+						return i.Path;
+						break;
+					}
+				}
+				else
+				{
+					if (GetStringSha256Hash(i.Path.Replace(requestFile.Path, "")) == requestFile.UID_ROOT)
+					{
+						return i.Path;
+					}
+				}
+			}
+			return "";
+		}
+		public static string RoundByte(long Bytes)
+		{
+			if (Bytes < Math.Pow(1024, 1)) return $"{Bytes} Б";
+			else if (Bytes < Math.Pow(1024, 2)) return $"{Math.Round((float)Bytes / 1024, 2)} Кб";
+			else if (Bytes < Math.Pow(1024, 3)) return $"{Math.Round((float)Bytes / Math.Pow(1024, 2), 2)} Мб";
+			else if (Bytes < Math.Pow(1024, 4)) return $"{Math.Round((float)Bytes / Math.Pow(1024, 3), 2)} Гб";
+			return "";
+		}
 		private static ItemTree CreateItem(string path, string root_path)
 		{
 			ItemTree item = new ItemTree();

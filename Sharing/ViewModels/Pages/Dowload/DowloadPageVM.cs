@@ -131,7 +131,6 @@ namespace Sharing.ViewModels.Pages.Dowload
 		private void OnDowloadNodeCommandExecuted(object e)
 		{
 			DowloadWindow window = new DowloadWindow();
-			Console.WriteLine(SelectedNode);
 			DowloadWindowVM vm = new DowloadWindowVM();
 			vm.DowloadNode = SelectedNode.Tag as ItemTree;
 			vm.Start();

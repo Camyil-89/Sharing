@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using Sharing.API.Net;
+using System.Net;
 
 namespace Sharing.Http.Client
 {

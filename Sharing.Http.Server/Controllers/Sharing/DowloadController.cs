@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Sharing.API;
 using Sharing.Http.Server.Services;
+using Sharing.Services;
 using System.IO;
 using System.Net;
 using System.Text;
@@ -15,11 +16,20 @@ namespace Sharing.Http.Server.Controllers.Sharing
 		[HttpGet]
 		public async Task<FileStreamResult> Dowload()
 		{
-			Console.WriteLine("ASDASD");
-			return new FileStreamResult(new MemoryStream(Encoding.UTF8.GetBytes("Hello")), "application/octet-stream")
+			try
 			{
-				FileDownloadName = "MyData.xml"
-			};
+				var file = await HttpContext.Request.ReadFromJsonAsync<API.Models.RequestFileInfo>();
+				var path = Utilities.GetSharingFilePath(Settings.SharingFiles, file);
+				if (!System.IO.File.Exists(path))
+					return new FileStreamResult(new MemoryStream(), "application/octet-stream");
+				return new FileStreamResult(new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read, 4096), "application/octet-stream");
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine(ex);
+				return new FileStreamResult(new MemoryStream(), "application/octet-stream");
+			}
+
 		}
 	}
 }

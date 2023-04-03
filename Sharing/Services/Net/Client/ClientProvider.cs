@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Sharing.API;
+using Sharing.API.Models;
 using Sharing.Http.Client;
 using Sharing.ViewModels.Pages.Dowload;
 using Sharing.ViewModels.Windows.Main;
@@ -115,7 +116,8 @@ namespace Sharing.Services.Net.Client
 			}
 			try
 			{
-				HttpClient.Requests.test();
+				var di = new DowloadInfo() { Files = new List<RequestFileInfo>() { new API.Models.RequestFileInfo() { Path = "", UID_ROOT = "EC8811836F6079D255EDA8B9D4924143B7CA3253315BB34896375F189A2E2A83" } } };
+				di.StartDowload(HttpClient.Requests, 4096);
 			}
 			catch (Exception ex) { Console.WriteLine(ex); }
 			Task.Run(InternalLoop);

@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Sharing.API;
+using Sharing.API.Net;
 using Sharing.Http.Client;
 using Sharing.ViewModels.Pages.SharingVM;
 using Sharing.ViewModels.Windows.Main;
@@ -16,6 +17,11 @@ using System.Windows.Controls.Primitives;
 
 namespace Sharing.Services.Net.Server
 {
+	public	enum StatusServer: byte
+	{
+		OK = 1,
+		Shutdown = 0
+	}
 	internal static class ServerProvider
 	{
 		private static ViewModels.Pages.SharingVM.SharingPageVM SharingPageVM = App.Host.Services.GetRequiredService<ViewModels.Pages.SharingVM.SharingPageVM>();
@@ -66,7 +72,7 @@ namespace Sharing.Services.Net.Server
 
 		public static void SetSharingFolder()
 		{
-			if (GetStatusServer() != Sharing.Server.StatusServer.Started)
+			if (GetStatusServer() != StatusServer.OK)
 				return;
 			try
 			{
@@ -79,9 +85,9 @@ namespace Sharing.Services.Net.Server
 			}
 		}
 
-		public static Sharing.Server.StatusServer GetStatusServer()
+		public static StatusServer GetStatusServer()
 		{
-			return ServerProcess == null ? Sharing.Server.StatusServer.Stop : Sharing.Server.StatusServer.Started;//Http.Server.Services.Server.IsStarted ? Sharing.Server.StatusServer.Started : Sharing.Server.StatusServer.Stop;
+			return ServerProcess == null ? StatusServer.Shutdown : StatusServer.OK; //Http.Server.Services.Server.IsStarted ? Sharing.Server.StatusServer.Started : Sharing.Server.StatusServer.Stop;
 		}
 		//public static Sharing.Server.StatusServer GetStatusServer()
 		//{

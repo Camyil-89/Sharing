@@ -8,8 +8,9 @@ using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Sharing.API.Models;
 
-namespace Sharing.Http.Client
+namespace Sharing.API.Net
 {
 	public class Requests
 	{
@@ -49,18 +50,20 @@ namespace Sharing.Http.Client
 			message.Content = JsonContent.Create(obj);
 			return HttpClient.Send(message);
 		}
-
-		public void test()
+		public IEnumerable<DowlaodFileInfo> DowloadFile(RequestFileInfo requestFile, int buffer_size)
 		{
-			//var request = new HttpRequestMessage(HttpMethod.Post, $"{Url}/api/dowload/files");
-			var response = HttpClient.GetAsync($"{Url}/api/dowload/files").Result;
-			var stream = response.Content.ReadAsStreamAsync().Result;
+			var rqst = new HttpRequestMessage(HttpMethod.Get, $"{Url}/api/dowload/files");
+			rqst.Content = JsonContent.Create(requestFile);
 
-			byte[] buffer = new byte[4096];
+			var response = HttpClient.SendAsync(rqst).Result;
+			var stream = response.Content.ReadAsStreamAsync().Result;
+			stream.Position = requestFile.BlockSize * requestFile.StartBlock;
+
+			byte[] buffer = new byte[buffer_size];
 			int bytesRead;
 			while ((bytesRead = stream.Read(buffer, 0, buffer.Length)) > 0)
 			{
-				Console.WriteLine($"{stream.Length}>{Encoding.UTF8.GetString(buffer)}|{bytesRead}");
+				yield return new DowlaodFileInfo() {BufferSize = buffer_size, Data = buffer, ReadBytes = bytesRead };
 			}
 		}
 	}
