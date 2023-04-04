@@ -50,21 +50,13 @@ namespace Sharing.API.Net
 			message.Content = JsonContent.Create(obj);
 			return HttpClient.Send(message);
 		}
-		public DowlaodFileInfo DowloadFile(RequestFileInfo requestFile, int buffer_size)
+		public DowlaodFileInfo DowloadFile(RequestFileInfo requestFile)
 		{
 			var rqst = new HttpRequestMessage(HttpMethod.Get, $"{Url}/api/dowload/files");
 			rqst.Content = JsonContent.Create(requestFile);
 
 			var response = HttpClient.SendAsync(rqst).Result;
 			return response.Content.ReadFromJsonAsync<DowlaodFileInfo>().Result;
-			//stream.Position = requestFile.BlockSize * requestFile.StartBlock;
-			//
-			//byte[] buffer = new byte[buffer_size];
-			//int bytesRead;
-			//while ((bytesRead = stream.Read(buffer, 0, buffer.Length)) > 0)
-			//{
-			//	yield return new DowlaodFileInfo() { BufferSize = buffer_size, Data = buffer, ReadBytes = bytesRead };
-			//}
 		}
 	}
 }

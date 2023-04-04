@@ -14,7 +14,7 @@ namespace Sharing.API.Models
 
 		public long SpeedDowload = 0;
 
-		public void StartDowload(Requests requests, int buffer_size, string path)
+		public void StartDowload(Requests requests, string path)
 		{
 			foreach (var file in Files)
 			{
@@ -24,15 +24,13 @@ namespace Sharing.API.Models
 				int DowloadSize = 0;
 				FileStream fileStream = new FileStream(path, FileMode.Create, FileAccess.Write);
 				fileStream.Position = file.BlockSize * file.StartBlock;
-				//Stopwatch stopwatch = Stopwatch.StartNew();
-				//Stopwatch stopwatch_1 = Stopwatch.StartNew();
 				try
 				{
 					bool IsError = false;
 					while (DowloadSize != file.TotalSize)
 					{
 						Stopwatch stopwatch = Stopwatch.StartNew();
-						var fileinfo = requests.DowloadFile(file, buffer_size);
+						var fileinfo = requests.DowloadFile(file);
 						if (fileinfo.Message != Message.OK)
 						{
 							IsError = true;
@@ -45,7 +43,8 @@ namespace Sharing.API.Models
 						{
 							file.StartBlock = DowloadSize / file.BlockSize;
 						}
-						Console.WriteLine($"{Utilities.RoundByte((long)(fileinfo.Data.Length / stopwatch.Elapsed.TotalSeconds))}");
+						SpeedDowload = (long)(fileinfo.Data.Length / stopwatch.Elapsed.TotalSeconds);
+						Console.WriteLine($"{Utilities.RoundByte(SpeedDowload)}");
 					}
 					if (!IsError)
 						file.IsFinish = true;
