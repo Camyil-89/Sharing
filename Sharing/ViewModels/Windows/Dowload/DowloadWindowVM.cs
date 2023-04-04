@@ -33,7 +33,7 @@ namespace Sharing.ViewModels.Windows.Dowload
 		#region Functions
 		public void Start()
 		{
-			Console.WriteLine($"{DowloadNode.Path}|{DowloadNode.Name}|{DowloadNode.UID_ROOT}");
+			Console.WriteLine($"{DowloadNode.Path}|{DowloadNode.Name}|{DowloadNode.UID_ROOT}|{DowloadNode.Size}");
 		}
 		#endregion
 	}

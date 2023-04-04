@@ -6,11 +6,16 @@ using System.Threading.Tasks;
 
 namespace Sharing.API.Models
 {
+	public enum Message: byte
+	{
+		Error = 0,
+		OK = 1,
+		BigSizeBlock = 2,
+	}
 	public class DowlaodFileInfo
 	{
-		public byte[] Data { get; set; }
-		public int BufferSize { get; set; }
-		public int ReadBytes { get; set; }
+		public byte[] Data { get; set; } = new byte[0];
 
+		public Message Message { get; set; } = Message.Error;
 	}
 }

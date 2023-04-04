@@ -116,8 +116,10 @@ namespace Sharing.Services.Net.Client
 			}
 			try
 			{
-				var di = new DowloadInfo() { Files = new List<RequestFileInfo>() { new API.Models.RequestFileInfo() { Path = "", UID_ROOT = "EC8811836F6079D255EDA8B9D4924143B7CA3253315BB34896375F189A2E2A83" } } };
-				di.StartDowload(HttpClient.Requests, 4096);
+				//var di = new DowloadInfo() { Files = new List<RequestFileInfo>() { new API.Models.RequestFileInfo() { Path = "", UID_ROOT = "18E67CF606C6E141B6DD79DA9279FEFDEFE03F4D566C6D629021ADDB16A46944", TotalSize = 24672 } } };
+				//var di = new DowloadInfo() { Files = new List<RequestFileInfo>() { new API.Models.RequestFileInfo() { Path = "", UID_ROOT = "C1E440A6CFF901294D802403DCED44A2D6271D9DAF50E49BB73AAC3F4A1D420F", TotalSize = 907 } } };
+				var di = new DowloadInfo() { Files = new List<RequestFileInfo>() { new API.Models.RequestFileInfo() { Path = "", UID_ROOT = "CE645D6187176138C451D6209111770942F3D0E01E7B9F00880DD1DC03A3BF2D", TotalSize = 147968 } } };
+				di.StartDowload(HttpClient.Requests, 4096, $"{Environment.CurrentDirectory}\\test.exe");
 			}
 			catch (Exception ex) { Console.WriteLine(ex); }
 			Task.Run(InternalLoop);
