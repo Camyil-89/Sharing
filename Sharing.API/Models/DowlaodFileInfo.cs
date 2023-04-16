@@ -11,6 +11,7 @@ namespace Sharing.API.Models
 		Error = 0,
 		OK = 1,
 		BigSizeBlock = 2,
+		ErrorPath = 3,
 	}
 	public class DowlaodFileInfo
 	{

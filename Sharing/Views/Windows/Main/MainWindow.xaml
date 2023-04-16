@@ -28,9 +28,9 @@
 			</StackPanel>
 			<StackPanel Orientation="Horizontal" Visibility="{Binding VisibilityClientStatus}">
 				<StackPanel Orientation="Horizontal">
-					<TextBlock Text="{Binding StringFormat=IP сервера: {0}, Path=IPaddressServer}"/>
+					<TextBlock Text="{Binding StringFormat=IP сервера: {0}, Path=IPaddressConnectServer}"/>
 					<TextBlock Text=" | "/>
-					<TextBlock Text="{Binding StringFormat=Порт сервера: {0}, Path=Settings.Parametrs.ServerPort}"/>
+					<TextBlock Text="{Binding StringFormat=Порт сервера: {0}, Path=Settings.Parametrs.ConnectPortServer}"/>
 					<TextBlock Text=" | "/>
 					<TextBlock Text="{Binding StringFormat=Пинг: {0}, Path=TextPing}"/>
 				</StackPanel>

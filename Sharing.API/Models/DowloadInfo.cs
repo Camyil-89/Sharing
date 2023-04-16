@@ -13,36 +13,38 @@ namespace Sharing.API.Models
 	{
 		public long TotalSize { get; set; }
 		public long DowloadSize { get; set; }
-		public string Path { get; set; }
+		public string Path { get; set; } = "";
 		public long SpeedDowload { get; set; }
+		public string CountFilesDowloadAndNeedDowload { get; set; } = "";
 	}
 	public class DowloadInfo
 	{
 		public List<RequestFileInfo> Files { get; set; } = new List<RequestFileInfo>();
 		public List<StatsDowload> StatsDowloads { get; set; } = new List<StatsDowload>();
-		public string PathSaveProgress;
+		public string PathSaveProgress { get; set; }
 
 		public long SpeedDowload = 0;
 		public bool IsDowload = false;
 
 		public bool Abort = false;
 
-		public bool Dowload(RequestFileInfo file, string root_path, Requests requests)
+		public bool Dowload(RequestFileInfo file, Requests requests)
 		{
 			if (file.IsFinish)
 				return true;
 			StatsDowload stats = new StatsDowload();
 			StatsDowloads.Add(stats);
-			int DowloadSize = 0;
-			string path = $"{root_path}{file.Path}";
+			string path = $"{file.RootPath}{file.Path}";
 			if (string.IsNullOrEmpty(file.Path))
 			{
-				path = $"{root_path}\\{file.Name}";
+				path = $"{file.RootPath}\\{file.Name}";
 			}
 			stats.Path = path;
 			stats.TotalSize = file.TotalSize;
-			FileStream fileStream = new FileStream(path, FileMode.Create, FileAccess.Write);
+			stats.CountFilesDowloadAndNeedDowload = $"{StatsDowloads.Count} \\ {Files.Count}";
+			FileStream fileStream = new FileStream(path, FileMode.OpenOrCreate, FileAccess.Write);
 			fileStream.Position = file.BlockSize * file.StartBlock;
+			long DowloadSize = fileStream.Position;
 			try
 			{
 				bool IsError = false;
@@ -60,7 +62,7 @@ namespace Sharing.API.Models
 
 					if (DowloadSize >= file.BlockSize * file.StartBlock)
 					{
-						file.StartBlock = DowloadSize / file.BlockSize;
+						file.StartBlock = (int)(DowloadSize / file.BlockSize);
 						SaveInfo();
 					}
 					SpeedDowload = (long)(fileinfo.Data.Length / stopwatch.Elapsed.TotalSeconds);
@@ -68,22 +70,22 @@ namespace Sharing.API.Models
 					stats.SpeedDowload = SpeedDowload;
 					fileinfo.Data = null;
 				}
-				if (!IsError)
+				if (!IsError && Abort == false)
 					file.IsFinish = true;
 				SaveInfo();
 				fileStream.Close();
-				return true;
+				return file.IsFinish;
 			}
 			catch (Exception ex)
 			{
 				Console.WriteLine(ex);
-				file.StartBlock = DowloadSize / file.BlockSize;
+				file.StartBlock = (int)(DowloadSize / file.BlockSize);
 			}
 			fileStream.Close();
 			SaveInfo();
 			return false;
 		}
-		public void StartDowload(Requests requests, string root_path)
+		public void StartDowload(Requests requests)
 		{
 			int count = 0;
 			IsDowload = false;
@@ -91,7 +93,7 @@ namespace Sharing.API.Models
 			{
 				if (Abort)
 					break;
-				if (Dowload(file, root_path, requests))
+				if (Dowload(file, requests))
 					count++;
 			}
 			IsDowload = count == Files.Count;

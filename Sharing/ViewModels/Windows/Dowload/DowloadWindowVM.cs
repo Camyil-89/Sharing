@@ -151,6 +151,13 @@ namespace Sharing.ViewModels.Windows.Dowload
 		#endregion
 
 
+		#region DowloadFileAndNeedDowload: Description
+		/// <summary>Description</summary>
+		private string _DowloadFileAndNeedDowload;
+		/// <summary>Description</summary>
+		public string DowloadFileAndNeedDowload { get => _DowloadFileAndNeedDowload; set => Set(ref _DowloadFileAndNeedDowload, value); }
+		#endregion
+
 		#region BlockSize: Description
 		/// <summary>Description</summary>
 		private int _BlockSize = 0;
@@ -197,50 +204,60 @@ namespace Sharing.ViewModels.Windows.Dowload
 			SetModeWindow(ModeWindow.DowloadWindow);
 			GenerateFolders();
 			Task.Run(() => { StartDowload(); });
-			Task.Run(() =>
-			{
-				while (!DowloadInfo.IsDowload)
-				{
-					try
-					{
-						var stat = DowloadInfo.StatsDowloads.Last();
-
-						MaximumSize = stat.TotalSize;
-						NowValue = stat.DowloadSize;
-						NowPath = stat.Path;
-						TextSpeed = $"{Utilities.RoundByte(stat.SpeedDowload)} / сек. ({Utilities.RoundByte(stat.DowloadSize)} \\ {Utilities.RoundByte(stat.TotalSize)})";
-						Thread.Sleep(100);
-					}
-					catch (Exception ex) { Log.WriteLine(ex, LogLevel.Error); }
-
-				}
-			});
+			Task.Run(() => { WatcherStatInfo(); });
 		}
 		#endregion
 		#endregion
 
 		#region Functions
+		private void WatcherStatInfo()
+		{
+			while (!DowloadInfo.IsDowload)
+			{
+				try
+				{
+					var stat = DowloadInfo.StatsDowloads.Last();
+
+					MaximumSize = stat.TotalSize;
+					NowValue = stat.DowloadSize;
+					NowPath = stat.Path;
+					DowloadFileAndNeedDowload = stat.CountFilesDowloadAndNeedDowload;
+					TextSpeed = $"{Utilities.RoundByte(stat.SpeedDowload)} / сек. ({Utilities.RoundByte(stat.DowloadSize)} \\ {Utilities.RoundByte(stat.TotalSize)})";
+					Thread.Sleep(50);
+				}
+				catch (Exception ex) { Log.WriteLine(ex, LogLevel.Error); }
+
+			}
+		}
 		private void ResumeDowload(string path)
 		{
 			if (!File.Exists(path))
 			{
 				MessageBoxHelper.ExclamationShow("Не получиться возобновить загрузку! Файла с данными не существует!");
+				ClientProvider.SetResumePathDowload("");
+				App.Current.Dispatcher.Invoke(() => { Window.Close(); });
 				return;
 			}
-
+			SetModeWindow(ModeWindow.DowloadWindow);
+			DowloadInfo = new DowloadInfo();
+			DowloadInfo.PathSaveProgress = path;
+			DowloadInfo.LoadInfo();
+			Task.Run(() => { Dowload(); });
+			Task.Run(() => { WatcherStatInfo(); });
+			
 		}
 		private void Dowload()
 		{
 			StopwatchTimeDowload.Start();
-			ClientProvider.DowloadFile(DowloadInfo, PathToDowload);
+			ClientProvider.DowloadFile(DowloadInfo);
 			StopwatchTimeDowload.Stop();
+			App.Current.Dispatcher.Invoke(() => { Window.Close(); });
 			if (DowloadInfo.IsDowload)
 			{
 				MessageBoxHelper.InfoShow($"Скачивание завершенно за {StopwatchTimeDowload.Elapsed}!");
-				Settings.Instance.Parametrs.LastDowload = "";
-				Program.SaveSettings();
+				File.Delete(Settings.Instance.Parametrs.LastDowload);
+				ClientProvider.SetResumePathDowload("");
 			}
-			App.Current.Dispatcher.Invoke(() => { Window.Close(); });
 		}
 		private void StartDowload()
 		{
@@ -250,9 +267,12 @@ namespace Sharing.ViewModels.Windows.Dowload
 			Directory.CreateDirectory($"{Directory.GetCurrentDirectory()}\\dowloads");
 			string path = $"{Directory.GetCurrentDirectory()}\\dowloads\\{System.IO.Path.GetRandomFileName()}.sharing.tmp";
 			File.Create(path).Close();
-			Settings.Instance.Parametrs.LastDowload = path;
-			Program.SaveSettings();
+			ClientProvider.SetResumePathDowload(path);
 			DowloadInfo.PathSaveProgress = path;
+			foreach (var i in DowloadInfo.Files)
+			{
+				i.RootPath = PathToDowload;
+			}
 			Dowload();
 		}
 		private void GenerateFolders()
@@ -332,21 +352,32 @@ namespace Sharing.ViewModels.Windows.Dowload
 		{
 			VisibilityDowloadWindow = mode == ModeWindow.DowloadWindow ? Visibility.Visible : Visibility.Collapsed;
 			VisibilitySelectFile = mode == ModeWindow.SelectFileDowload ? Visibility.Visible : Visibility.Collapsed;
+
+			if (VisibilityDowloadWindow == Visibility.Visible)
+			{
+				Window.Width = 450;
+				Window.Height = 150;
+			}
 		}
-		public void Start(ModeWindow mode)
+		public void Start(ModeWindow mode, bool Resume)
 		{
 			try
 			{
 				Window.Closed += Window_Closed;
+				var set = ClientProvider.GetSettingsServer();
+				ServerBlockSize = set.MaxSizeBlock;
+				BlockSize = set.MaxSizeBlock;
+				if (Resume)
+				{
+					ResumeDowload(Settings.Instance.Parametrs.LastDowload);
+					return;
+				}
 				SetModeWindow(mode);
 				PathToDowload = $"{KnownFolders.Downloads.Path}\\{DowloadNode.Name}";
 				if (File.Exists(PathToDowload))
 					PathToDowload += $" ({System.IO.Path.GetRandomFileName()})";
-				//Console.WriteLine($"{DowloadNode.Path}|{DowloadNode.Name}|{DowloadNode.UID_ROOT}|{DowloadNode.Size}");
 				GenereateTree();
-				var set = ClientProvider.GetSettingsServer();
-				ServerBlockSize = set.MaxSizeBlock;
-				BlockSize = set.MaxSizeBlock;
+				
 			}
 			catch (Exception ex)
 			{
@@ -359,7 +390,6 @@ namespace Sharing.ViewModels.Windows.Dowload
 
 		private void Window_Closed(object? sender, EventArgs e)
 		{
-			Console.WriteLine("asdasdasdas");
 			DowloadInfo.Abort = true;
 		}
 		#endregion

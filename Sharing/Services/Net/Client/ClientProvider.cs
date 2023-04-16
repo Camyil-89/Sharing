@@ -14,6 +14,7 @@ using System.Net.Http;
 using System.Net.Http.Json;
 using System.Net.Mail;
 using System.Net.Sockets;
+using System.Runtime.Loader;
 using System.Text;
 using System.Text.Json;
 using System.Threading;
@@ -36,7 +37,7 @@ namespace Sharing.Services.Net.Client
 
 		public static void Init()
 		{
-
+			DowloadPageVM.VisibilityResumeBtn = File.Exists(Settings.Instance.Parametrs.LastDowload) ? System.Windows.Visibility.Visible: System.Windows.Visibility.Collapsed;
 		}
 		private static void InternalLoop()
 		{
@@ -99,6 +100,7 @@ namespace Sharing.Services.Net.Client
 		{
 			LastUpdateTree = DateTime.Now;
 			HttpClient = new Http.Client.Client();
+			MainWindowVM.IPaddressConnectServer = $"{address.ToString()}";
 			if (!HttpClient.Connect($"http://{address}:{port}"))
 			{
 				Stop();
@@ -124,6 +126,7 @@ namespace Sharing.Services.Net.Client
 			catch (Exception ex) { Console.WriteLine(ex); }
 			Task.Run(InternalLoop);
 			MainWindowVM.VisibilityClientStatus = System.Windows.Visibility.Visible;
+			DowloadPageVM.IsEnableSettings = false;
 			DowloadPageVM.StartStopButtonText = "Отключиться";
 		}
 		public static void Stop()
@@ -133,6 +136,7 @@ namespace Sharing.Services.Net.Client
 			MainWindowVM.VisibilityClientStatus = System.Windows.Visibility.Collapsed;
 			DowloadPageVM.ListNodes.Clear();
 			DowloadPageVM.StartStopButtonText = "Подключиться";
+			DowloadPageVM.IsEnableSettings = true;
 		}
 
 		public static Sharing.Http.Client.Status GetStatus()
@@ -147,9 +151,16 @@ namespace Sharing.Services.Net.Client
 			return HttpClient.Requests.GetSettingsServer();
 		}
 
-		public static void DowloadFile(DowloadInfo dowloadInfo, string root_path)
+		public static void SetResumePathDowload(string path)
 		{
-			dowloadInfo.StartDowload(HttpClient.Requests, root_path);
+			Settings.Instance.Parametrs.LastDowload = path;
+			DowloadPageVM.VisibilityResumeBtn = File.Exists(Settings.Instance.Parametrs.LastDowload) ? System.Windows.Visibility.Visible : System.Windows.Visibility.Collapsed;
+			Program.SaveSettings();
+		}
+
+		public static void DowloadFile(DowloadInfo dowloadInfo)
+		{
+			dowloadInfo.StartDowload(HttpClient.Requests);
 		}
 	}
 }

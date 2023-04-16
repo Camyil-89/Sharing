@@ -74,7 +74,15 @@ namespace Sharing.ViewModels.Pages.Dowload
 		}
 
 		#region Parametrs
+		public Settings Settings => Settings.Instance;
 
+
+		#region VisibilityResumeBtn: Description
+		/// <summary>Description</summary>
+		private Visibility _VisibilityResumeBtn = Visibility.Collapsed;
+		/// <summary>Description</summary>
+		public Visibility VisibilityResumeBtn { get => _VisibilityResumeBtn; set => Set(ref _VisibilityResumeBtn, value); }
+		#endregion
 
 		#region StartStopButtonText: Description
 		/// <summary>Description</summary>
@@ -106,6 +114,14 @@ namespace Sharing.ViewModels.Pages.Dowload
 		public ObservableCollection<TreeViewItem> ListNodes { get => _ListNodes; set => Set(ref _ListNodes, value); }
 		#endregion
 
+
+		#region IsEnableSettings: Description
+		/// <summary>Description</summary>
+		private bool _IsEnableSettings = true;
+		/// <summary>Description</summary>
+		public bool IsEnableSettings { get => _IsEnableSettings; set => Set(ref _IsEnableSettings, value); }
+		#endregion
+
 		#endregion
 
 		#region Commands
@@ -118,12 +134,32 @@ namespace Sharing.ViewModels.Pages.Dowload
 		private void OnStartStopClientCommandExecuted(object e)
 		{
 			if (Services.Net.Client.ClientProvider.GetStatus() == Http.Client.Status.Shutdown)
-				Services.Net.Client.ClientProvider.Start(new System.Net.IPAddress(new byte[] { 192, 168, 1, 65 }), Settings.Instance.Parametrs.ConnectPortServer);
+				Services.Net.Client.ClientProvider.Start(new System.Net.IPAddress(Settings.Instance.Parametrs.ConnectAddressServer), Settings.Instance.Parametrs.ConnectPortServer);
 			else
 				Services.Net.Client.ClientProvider.Stop();
 		}
 		#endregion
 
+
+		#region ResumeDowloadCommand: Description
+		private ICommand _ResumeDowloadCommand;
+		public ICommand ResumeDowloadCommand => _ResumeDowloadCommand ??= new LambdaCommand(OnResumeDowloadCommandExecuted, CanResumeDowloadCommandExecute);
+		private bool CanResumeDowloadCommandExecute(object e) => Services.Net.Client.ClientProvider.GetStatus() == Http.Client.Status.OK;
+		private void OnResumeDowloadCommandExecuted(object e)
+		{
+			try
+			{
+				DowloadWindow window = new DowloadWindow();
+				DowloadWindowVM vm = new DowloadWindowVM();
+				vm.Window = window;
+				vm.Start(ModeWindow.SelectFileDowload, true);
+				window.DataContext = vm;
+
+				window.Owner = App.Current.MainWindow;
+				window.ShowDialog();
+			} catch { }
+		}
+		#endregion
 		#region DowloadNodeCommand: Description
 		private ICommand _DowloadNodeCommand;
 		public ICommand DowloadNodeCommand => _DowloadNodeCommand ??= new LambdaCommand(OnDowloadNodeCommandExecuted, CanDowloadNodeCommandExecute);
@@ -136,11 +172,11 @@ namespace Sharing.ViewModels.Pages.Dowload
 				DowloadWindowVM vm = new DowloadWindowVM();
 				vm.DowloadNode = SelectedNode.Tag as ItemTree;
 				vm.Window = window;
-				vm.Start(ModeWindow.SelectFileDowload);
+				vm.Start(ModeWindow.SelectFileDowload, false);
 				window.DataContext = vm;
 
 				window.Owner = App.Current.MainWindow;
-				window.Show();
+				window.ShowDialog();
 			}
 			catch { }
 		}

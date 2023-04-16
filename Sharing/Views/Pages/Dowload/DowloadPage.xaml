@@ -18,16 +18,63 @@
 		</Grid.RowDefinitions>
 		<StackPanel Orientation="Horizontal" Grid.Row="0" Margin="5 5 0 0">
 			<Button Style="{StaticResource LeftMenuButton}" Content="{Binding StartStopButtonText}" Command="{Binding StartStopClientCommand}" IsEnabled="{Binding ActiveStartStopButton}" Height="30"/>
+			<Button Style="{StaticResource LeftMenuButton}" Content="Возобновить" Command="{Binding ResumeDowloadCommand}" Margin="5 0 0 0" Height="30"
+					Visibility="{Binding VisibilityResumeBtn}"/>
 		</StackPanel>
-		<TreeView Grid.Row="1" ItemsSource="{Binding ListNodes}" FontSize="14">
-			<i:Interaction.Behaviors>
-				<vm:BindableSelectedItemBehavior SelectedItem="{Binding SelectedNode, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-			</i:Interaction.Behaviors>
-			<TreeView.ContextMenu>
-				<ContextMenu>
-					<MenuItem Header="Скачать" Command="{Binding DowloadNodeCommand}" CommandParameter="{Binding SelectedNode}"/>
-				</ContextMenu>
-			</TreeView.ContextMenu>
-		</TreeView>
+		<TabControl Grid.Row="1">
+			<TabItem Header="Файлы">
+				<TreeView Grid.Row="1" ItemsSource="{Binding ListNodes}" FontSize="14">
+					<i:Interaction.Behaviors>
+						<vm:BindableSelectedItemBehavior SelectedItem="{Binding SelectedNode, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+					</i:Interaction.Behaviors>
+					<TreeView.ContextMenu>
+						<ContextMenu>
+							<MenuItem Header="Скачать" Command="{Binding DowloadNodeCommand}" CommandParameter="{Binding SelectedNode}"/>
+						</ContextMenu>
+					</TreeView.ContextMenu>
+				</TreeView>
+			</TabItem>
+			<TabItem Header="Настройки" IsEnabled="{Binding IsEnableSettings}">
+				<Grid>
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition/>
+						<ColumnDefinition/>
+					</Grid.ColumnDefinitions>
+					<StackPanel Orientation="Vertical" Grid.Row="0">
+						<GroupBox Header="Подключение">
+							<StackPanel Orientation="Vertical">
+								<Grid Margin="3">
+									<Grid.ColumnDefinitions>
+										<ColumnDefinition/>
+										<ColumnDefinition/>
+									</Grid.ColumnDefinitions>
+									<TextBlock Text="Порт подключения" Grid.Row="0"/>
+									<TextBox Text="{Binding Settings.Parametrs.ConnectPortServer}" Grid.Column="1" Grid.Row="0"/>
+								</Grid>
+								<Grid Margin="3">
+									<Grid.ColumnDefinitions>
+										<ColumnDefinition/>
+										<ColumnDefinition/>
+									</Grid.ColumnDefinitions>
+									<TextBlock Text="IP адрес" Grid.Row="0"/>
+									<Grid Grid.Column="1">
+										<Grid.ColumnDefinitions>
+											<ColumnDefinition/>
+											<ColumnDefinition/>
+											<ColumnDefinition/>
+											<ColumnDefinition/>
+										</Grid.ColumnDefinitions>
+										<TextBox Text="{Binding Settings.Parametrs.ConnectAddressServer[0]}" Margin="1" Grid.Column="0"/>
+										<TextBox Text="{Binding Settings.Parametrs.ConnectAddressServer[1]}" Margin="1" Grid.Column="1"/>
+										<TextBox Text="{Binding Settings.Parametrs.ConnectAddressServer[2]}" Margin="1" Grid.Column="2"/>
+										<TextBox Text="{Binding Settings.Parametrs.ConnectAddressServer[3]}" Margin="1" Grid.Column="3"/>
+									</Grid>
+								</Grid>
+							</StackPanel>
+						</GroupBox>
+					</StackPanel>
+				</Grid>
+			</TabItem>
+		</TabControl>
 	</Grid>
 </Page>

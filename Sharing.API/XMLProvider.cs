@@ -13,7 +13,7 @@ namespace Sharing.Services
 
 	public class XMLProvider
 	{
-		public static bool CompressZip = false;
+		public static bool CompressZip = true;
 		public static void Save<T>(string path, object obj)
 		{
 			if (CompressZip)

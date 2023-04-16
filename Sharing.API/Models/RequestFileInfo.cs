@@ -8,6 +8,7 @@ namespace Sharing.API.Models
 {
 	public class RequestFileInfo
 	{
+		public string RootPath { get; set; }
 		public string UID_ROOT {get; set; }
 		public string Name { get; set; }
 		public string Path { get; set; }

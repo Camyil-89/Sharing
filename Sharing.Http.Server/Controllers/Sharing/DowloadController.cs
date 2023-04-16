@@ -26,14 +26,16 @@ namespace Sharing.Http.Server.Controllers.Sharing
 				if (!System.IO.File.Exists(path))
 					return new DowlaodFileInfo();
 
+				if (path.Contains("..\\"))
+					return new DowlaodFileInfo() { Message = Message.ErrorPath};
+
 				var file_str = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read, 4096);
+				file_str.Position = file.BlockSize * file.StartBlock;
 
 				byte[] buffer = new byte[file.BlockSize * Settings.Server.SizeBuffer];
 
 				if (buffer.Length > file.TotalSize - file.BlockSize * file.StartBlock)
 					buffer = new byte[file.TotalSize - file.BlockSize * file.StartBlock];
-
-				file_str.Position = file.BlockSize * file.StartBlock;
 				file_str.Read(buffer, 0, buffer.Length);
 
 				//Console.WriteLine($">{path}|{buffer.Length}|{file.TotalSize}|{file.BlockSize * file.StartBlock}|{file.TotalSize - file.BlockSize * file.StartBlock}|");

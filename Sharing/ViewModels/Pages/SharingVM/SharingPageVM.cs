@@ -84,6 +84,13 @@ namespace Sharing.ViewModels.Pages.SharingVM
 		public SharingFile SelectedPath { get => _SelectedPath; set => Set(ref _SelectedPath, value); }
 		#endregion
 
+
+		#region IsEnableSettings: Description
+		/// <summary>Description</summary>
+		private bool _IsEnableSettings = true;
+		/// <summary>Description</summary>
+		public bool IsEnableSettings { get => _IsEnableSettings; set => Set(ref _IsEnableSettings, value); }
+		#endregion
 		#endregion
 
 

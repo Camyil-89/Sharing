@@ -65,6 +65,14 @@ namespace Sharing.ViewModels.Windows.Main
 		#endregion
 
 
+		#region IPaddressConnectServer: Description
+		/// <summary>Description</summary>
+		private string _IPaddressConnectServer = "";
+		/// <summary>Description</summary>
+		public string IPaddressConnectServer { get => _IPaddressConnectServer; set => Set(ref _IPaddressConnectServer, value); }
+		#endregion
+
+
 		#region VisibilityServerStatus: Description
 		/// <summary>Description</summary>
 		private Visibility _VisibilityServerStatus = Visibility.Collapsed;

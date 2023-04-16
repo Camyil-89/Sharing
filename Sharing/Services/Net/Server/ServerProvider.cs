@@ -51,6 +51,7 @@ namespace Sharing.Services.Net.Server
 			ServerProcess = null;
 			MainWindowVM.VisibilityServerStatus = System.Windows.Visibility.Collapsed;
 			SharingPageVM.StartStopButtonText = "Запустить";
+			SharingPageVM.IsEnableSettings = true;
 		}
 		static Process ServerProcess = null;
 		public static void Start()
@@ -70,6 +71,7 @@ namespace Sharing.Services.Net.Server
 			//Http.Server.Services.Server.Start(new string[] { "--urls", $"http://[::]:{Settings.Instance.Parametrs.ServerPort}" });
 			MainWindowVM.VisibilityServerStatus = System.Windows.Visibility.Visible;
 			SharingPageVM.StartStopButtonText = "Остановить";
+			SharingPageVM.IsEnableSettings = false;
 		}
 
 		public static void SetSharingFolder()
