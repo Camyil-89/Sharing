@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Sharing.API;
+using Sharing.API.Models;
 using Sharing.API.Net;
 using Sharing.Http.Client;
 using Sharing.ViewModels.Pages.SharingVM;
@@ -17,7 +18,7 @@ using System.Windows.Controls.Primitives;
 
 namespace Sharing.Services.Net.Server
 {
-	public	enum StatusServer: byte
+	public enum StatusServer : byte
 	{
 		OK = 1,
 		Shutdown = 0
@@ -65,6 +66,7 @@ namespace Sharing.Services.Net.Server
 			});
 			Requests = new Requests($"http://127.0.0.1:{Settings.Instance.Parametrs.ServerPort}");
 			SetSharingFolder();
+			SetSettings();
 			//Http.Server.Services.Server.Start(new string[] { "--urls", $"http://[::]:{Settings.Instance.Parametrs.ServerPort}" });
 			MainWindowVM.VisibilityServerStatus = System.Windows.Visibility.Visible;
 			SharingPageVM.StartStopButtonText = "Остановить";
@@ -85,6 +87,24 @@ namespace Sharing.Services.Net.Server
 			}
 		}
 
+		public static void SetSettings()
+		{
+			if (GetStatusServer() != StatusServer.OK)
+				return;
+			try
+			{
+				Requests.SendPost("/api/settings/set_settings", new SettingsServer()
+				{
+					MaxSizeBlock = Settings.Instance.Parametrs.MaxSizeBlock,
+					SizeBuffer = 1,
+				});
+			}
+			catch (Exception ex)
+			{
+				Log.WriteLine(ex, LogLevel.Error);
+				Stop();
+			}
+		}
 		public static StatusServer GetStatusServer()
 		{
 			return ServerProcess == null ? StatusServer.Shutdown : StatusServer.OK; //Http.Server.Services.Server.IsStarted ? Sharing.Server.StatusServer.Started : Sharing.Server.StatusServer.Stop;

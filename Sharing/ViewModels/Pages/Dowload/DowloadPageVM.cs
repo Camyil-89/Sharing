@@ -130,14 +130,19 @@ namespace Sharing.ViewModels.Pages.Dowload
 		private bool CanDowloadNodeCommandExecute(object e) => SelectedNode != null;
 		private void OnDowloadNodeCommandExecuted(object e)
 		{
-			DowloadWindow window = new DowloadWindow();
-			DowloadWindowVM vm = new DowloadWindowVM();
-			vm.DowloadNode = SelectedNode.Tag as ItemTree;
-			vm.Start();
-			window.DataContext = vm;
+			try
+			{
+				DowloadWindow window = new DowloadWindow();
+				DowloadWindowVM vm = new DowloadWindowVM();
+				vm.DowloadNode = SelectedNode.Tag as ItemTree;
+				vm.Window = window;
+				vm.Start(ModeWindow.SelectFileDowload);
+				window.DataContext = vm;
 
-			window.Owner = App.Current.MainWindow;
-			window.Show();
+				window.Owner = App.Current.MainWindow;
+				window.Show();
+			}
+			catch { }
 		}
 		#endregion
 		#endregion

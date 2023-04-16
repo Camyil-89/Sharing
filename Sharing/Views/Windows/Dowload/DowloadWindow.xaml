@@ -5,11 +5,65 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Sharing.Views.Windows.Dowload"
         xmlns:vm="clr-namespace:Sharing.ViewModels.Windows.Dowload"
+        xmlns:CUI="clr-namespace:Sharing.CustomUI"
         mc:Ignorable="d"
 		WindowStartupLocation="CenterScreen"
 		ResizeMode="CanMinimize"
-        Title="DowloadWindow" Height="450" Width="800">
-    <Grid>
-        
-    </Grid>
+        Title="DowloadWindow"
+		Height="450"
+		Width="800">
+	<Window.DataContext>
+		<vm:DowloadWindowVM/>
+	</Window.DataContext>
+	<Grid>
+		<Grid Visibility="{Binding VisibilitySelectFile}" d:Visibility="Visible">
+			<Grid.RowDefinitions>
+				<RowDefinition/>
+				<RowDefinition Height="30"/>
+			</Grid.RowDefinitions>
+			<TreeView ItemsSource="{Binding Nodes}">
+				<TreeView.ItemTemplate>
+					<HierarchicalDataTemplate 
+    ItemsSource="{Binding Items}">
+						<StackPanel Orientation="Horizontal">
+							<CheckBox IsChecked="{Binding IsChecked}" FontSize="14"/>
+							<TextBlock Margin="5 0 0 0" FontSize="14" Text="{Binding Item.Name}"/>
+							<TextBlock Margin="5 0 0 0" FontSize="14" Text="|"/>
+							<TextBlock Margin="5 0 0 0" FontSize="14" Text="{Binding TextSize}"/>
+						</StackPanel>
+					</HierarchicalDataTemplate>
+				</TreeView.ItemTemplate>
+			</TreeView>
+			<Grid Grid.Row="1">
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="136"/>
+					<ColumnDefinition/>
+					<ColumnDefinition Width="60"/>
+				</Grid.ColumnDefinitions>
+				<Button Content="Скачать" Width="130" Grid.Column="0" HorizontalAlignment="Left" Margin="2" Command="{Binding StartDowloadCommand}"/>
+				<CUI:ToolTipTextBlock Grid.Column="1" Text="{Binding PathToDowload}" Width="600" TextTrimming="CharacterEllipsis" ToolTipService.ToolTip="{Binding PathToDowload}" VerticalAlignment="Center" FontSize="14"/>
+				<Button Grid.Column="2" Content="Изменить" Margin="2" Command="{Binding ChangePathCommand}"/>
+			</Grid>
+		</Grid>
+		<Grid Visibility="{Binding VisibilityDowloadWindow}" d:Visibility="Hidden">
+			<Grid.RowDefinitions>
+				<RowDefinition/>
+				<RowDefinition/>
+			</Grid.RowDefinitions>
+			<Grid Grid.Row="0">
+				<Grid.RowDefinitions>
+					<RowDefinition/>
+					<RowDefinition/>
+					<RowDefinition/>
+				</Grid.RowDefinitions>
+				<StackPanel Orientation="Horizontal" VerticalAlignment="Bottom" Grid.Row="0" HorizontalAlignment="Center">
+					<TextBlock FontSize="14" Text="{Binding TextSpeed}"/>
+				</StackPanel>
+				<ProgressBar Grid.Row="1" Margin="5" Value="{Binding NowValue}" Maximum="{Binding MaximumSize}"/>
+				<StackPanel Orientation="Horizontal" VerticalAlignment="Top" HorizontalAlignment="Left" Grid.Row="2">
+					<TextBlock FontFamily="14" Text="{Binding NowPath}"/>
+				</StackPanel>
+			</Grid>
+		</Grid>
+	</Grid>
 </Window>

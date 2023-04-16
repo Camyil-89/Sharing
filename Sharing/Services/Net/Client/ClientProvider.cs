@@ -118,8 +118,8 @@ namespace Sharing.Services.Net.Client
 			{
 				//var di = new DowloadInfo() { Files = new List<RequestFileInfo>() { new API.Models.RequestFileInfo() { Path = "", UID_ROOT = "18E67CF606C6E141B6DD79DA9279FEFDEFE03F4D566C6D629021ADDB16A46944", TotalSize = 24672 } } };
 				//var di = new DowloadInfo() { Files = new List<RequestFileInfo>() { new API.Models.RequestFileInfo() { Path = "", UID_ROOT = "C1E440A6CFF901294D802403DCED44A2D6271D9DAF50E49BB73AAC3F4A1D420F", TotalSize = 907 } } };
-				var di = new DowloadInfo() { Files = new List<RequestFileInfo>() { new API.Models.RequestFileInfo() { Path = "", UID_ROOT = "CE645D6187176138C451D6209111770942F3D0E01E7B9F00880DD1DC03A3BF2D", TotalSize = 147968 } } };
-				di.StartDowload(HttpClient.Requests, $"{Environment.CurrentDirectory}\\test.exe");
+				//var di = new DowloadInfo() { Files = new List<RequestFileInfo>() { new API.Models.RequestFileInfo() { Path = "", UID_ROOT = "CE645D6187176138C451D6209111770942F3D0E01E7B9F00880DD1DC03A3BF2D", TotalSize = 147968 } } };
+				//di.StartDowload(HttpClient.Requests, $"{Environment.CurrentDirectory}\\test.exe");
 			}
 			catch (Exception ex) { Console.WriteLine(ex); }
 			Task.Run(InternalLoop);
@@ -140,6 +140,16 @@ namespace Sharing.Services.Net.Client
 			if (HttpClient == null)
 				return Http.Client.Status.Shutdown;
 			return HttpClient.Status;
+		}
+
+		public static SettingsServer GetSettingsServer()
+		{
+			return HttpClient.Requests.GetSettingsServer();
+		}
+
+		public static void DowloadFile(DowloadInfo dowloadInfo, string root_path)
+		{
+			dowloadInfo.StartDowload(HttpClient.Requests, root_path);
 		}
 	}
 }

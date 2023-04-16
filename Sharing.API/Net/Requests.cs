@@ -58,5 +58,10 @@ namespace Sharing.API.Net
 			var response = HttpClient.SendAsync(rqst).Result;
 			return response.Content.ReadFromJsonAsync<DowlaodFileInfo>().Result;
 		}
+
+		public SettingsServer GetSettingsServer()
+		{
+			return Send("/api/settings").Content.ReadFromJsonAsync<SettingsServer>().Result;
+		}
 	}
 }

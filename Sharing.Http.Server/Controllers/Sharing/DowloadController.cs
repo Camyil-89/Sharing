@@ -13,8 +13,6 @@ namespace Sharing.Http.Server.Controllers.Sharing
 	[ApiController]
 	public class DowloadController : ControllerBase
 	{
-		private int SizeBuffer = 1; // BlockSize * SizeBuffer
-		private int MaxSizeBlock = 32000;
 		[Route("api/[controller]/files")]
 		[HttpGet]
 		public async Task<DowlaodFileInfo> Dowload()
@@ -22,16 +20,15 @@ namespace Sharing.Http.Server.Controllers.Sharing
 			try
 			{
 				var file = await HttpContext.Request.ReadFromJsonAsync<API.Models.RequestFileInfo>();
-				if (file.BlockSize > MaxSizeBlock)
+				if (file.BlockSize > Settings.Server.MaxSizeBlock)
 					return new DowlaodFileInfo() { Message = Message.BigSizeBlock };
 				var path = Utilities.GetSharingFilePath(Settings.SharingFiles, file);
 				if (!System.IO.File.Exists(path))
 					return new DowlaodFileInfo();
 
-
 				var file_str = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read, 4096);
 
-				byte[] buffer = new byte[file.BlockSize * SizeBuffer];
+				byte[] buffer = new byte[file.BlockSize * Settings.Server.SizeBuffer];
 
 				if (buffer.Length > file.TotalSize - file.BlockSize * file.StartBlock)
 					buffer = new byte[file.TotalSize - file.BlockSize * file.StartBlock];
@@ -39,7 +36,7 @@ namespace Sharing.Http.Server.Controllers.Sharing
 				file_str.Position = file.BlockSize * file.StartBlock;
 				file_str.Read(buffer, 0, buffer.Length);
 
-				Console.WriteLine($">{path}|{buffer.Length}|{file.TotalSize}|{file.BlockSize * file.StartBlock}|{file.TotalSize - file.BlockSize * file.StartBlock}|");
+				//Console.WriteLine($">{path}|{buffer.Length}|{file.TotalSize}|{file.BlockSize * file.StartBlock}|{file.TotalSize - file.BlockSize * file.StartBlock}|");
 				return new DowlaodFileInfo() { Data = buffer, Message = Message.OK };
 			}
 			catch (Exception ex)

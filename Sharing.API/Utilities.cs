@@ -73,7 +73,7 @@ namespace Sharing.API
 				{
 					if (GetStringSha256Hash(i.Path.Replace(requestFile.Path, "")) == requestFile.UID_ROOT)
 					{
-						return i.Path;
+						return $"{i.Path}{requestFile.Path}";
 					}
 				}
 			}
@@ -82,9 +82,9 @@ namespace Sharing.API
 		public static string RoundByte(long Bytes)
 		{
 			if (Bytes < Math.Pow(1024, 1)) return $"{Bytes} Б";
-			else if (Bytes < Math.Pow(1024, 2)) return $"{Math.Round((float)Bytes / 1024, 2)} Кб";
-			else if (Bytes < Math.Pow(1024, 3)) return $"{Math.Round((float)Bytes / Math.Pow(1024, 2), 2)} Мб";
-			else if (Bytes < Math.Pow(1024, 4)) return $"{Math.Round((float)Bytes / Math.Pow(1024, 3), 2)} Гб";
+			else if (Bytes < Math.Pow(1024, 2)) return $"{Math.Round((float)Bytes / 1024, 2)} Кбайт";
+			else if (Bytes < Math.Pow(1024, 3)) return $"{Math.Round((float)Bytes / Math.Pow(1024, 2), 2)} Мбайт";
+			else if (Bytes < Math.Pow(1024, 4)) return $"{Math.Round((float)Bytes / Math.Pow(1024, 3), 2)} Гбайт";
 			return "";
 		}
 		private static ItemTree CreateItem(string path, string root_path)

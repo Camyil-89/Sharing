@@ -95,6 +95,25 @@
 								</Grid>
 							</StackPanel>
 						</GroupBox>
+						<GroupBox Header="Передача данных">
+							<StackPanel Orientation="Vertical">
+								<Grid Margin="3">
+									<Grid.ColumnDefinitions>
+										<ColumnDefinition/>
+										<ColumnDefinition/>
+									</Grid.ColumnDefinitions>
+									<TextBlock Text="Размер блока (байт)" Grid.Row="0"/>
+									<Grid Grid.Column="1">
+										<Grid.ColumnDefinitions>
+											<ColumnDefinition/>
+											<ColumnDefinition/>
+										</Grid.ColumnDefinitions>
+										<TextBox Grid.Column="0" Text="{Binding Settings.Parametrs.MaxSizeBlock,UpdateSourceTrigger=PropertyChanged}" />
+										<TextBlock Grid.Column="1" Text="{Binding Settings.Parametrs.TextMaxSizeBlock}" Margin="5 0 0 0"/>
+									</Grid>
+								</Grid>
+							</StackPanel>
+						</GroupBox>
 					</StackPanel>
 				</Grid>
 			</TabItem>
