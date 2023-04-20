@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using System.Reflection;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 
@@ -9,7 +12,6 @@ namespace Sharing.Services
 {
 	public class MessageBoxHelper
 	{
-
 		/// <summary>
 		/// Окно сообщения содержит символ, состоящий из восклицательного знака в треугольнике
 		///     с желтым фоном.

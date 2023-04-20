@@ -6,8 +6,8 @@
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
     <StartupObject>Sharing.Program</StartupObject>
-    <AssemblyVersion>1.0</AssemblyVersion>
-    <FileVersion>1.0</FileVersion>
+    <AssemblyVersion>1.1</AssemblyVersion>
+    <FileVersion>1.1</FileVersion>
   </PropertyGroup>
 
   <ItemGroup>
@@ -22,6 +22,15 @@
     <ProjectReference Include="..\Sharing.http.Client\Sharing.Http.Client.csproj" />
     <ProjectReference Include="..\Sharing.Http.Server\Sharing.Http.Server.csproj" />
     <ProjectReference Include="..\Sharing.Services.Logging\Sharing.Services.Logging.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="UpdateAPIUI">
+      <HintPath>..\..\..\cs\UpdaterAPI\UpdateAPIUI\bin\Release\net6.0-windows\UpdateAPIUI.dll</HintPath>
+    </Reference>
+    <Reference Include="UpdaterAPI">
+      <HintPath>..\..\..\cs\UpdaterAPI\UpdaterAPI\bin\Release\net6.0\UpdaterAPI.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
 </Project>

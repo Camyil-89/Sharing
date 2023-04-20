@@ -13,7 +13,7 @@ namespace Sharing.API.Models
 		public string Name { get; set; }
 		public string Path { get; set; }
 		public bool IsFinish { get; set; }
-		public int StartBlock { get; set; } = 0;
+		public long DowloadSize { get; set; } = 0;
 		public long TotalSize { get; set; }
 		public int BlockSize { get; set; } = 2048;
 	}

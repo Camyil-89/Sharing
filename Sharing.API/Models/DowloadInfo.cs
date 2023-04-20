@@ -43,7 +43,7 @@ namespace Sharing.API.Models
 			stats.TotalSize = file.TotalSize;
 			stats.CountFilesDowloadAndNeedDowload = $"{StatsDowloads.Count} \\ {Files.Count}";
 			FileStream fileStream = new FileStream(path, FileMode.OpenOrCreate, FileAccess.Write);
-			fileStream.Position = file.BlockSize * file.StartBlock;
+			fileStream.Position = file.DowloadSize;
 			long DowloadSize = fileStream.Position;
 			try
 			{
@@ -60,9 +60,9 @@ namespace Sharing.API.Models
 					fileStream.Write(fileinfo.Data, 0, fileinfo.Data.Length);
 					DowloadSize += fileinfo.Data.Length;
 
-					if (DowloadSize >= file.BlockSize * file.StartBlock)
+					if (DowloadSize >= file.DowloadSize + file.BlockSize)
 					{
-						file.StartBlock = (int)(DowloadSize / file.BlockSize);
+						file.DowloadSize = DowloadSize;
 						SaveInfo();
 					}
 					SpeedDowload = (long)(fileinfo.Data.Length / stopwatch.Elapsed.TotalSeconds);
@@ -79,7 +79,7 @@ namespace Sharing.API.Models
 			catch (Exception ex)
 			{
 				Console.WriteLine(ex);
-				file.StartBlock = (int)(DowloadSize / file.BlockSize);
+				file.DowloadSize = DowloadSize;
 			}
 			fileStream.Close();
 			SaveInfo();

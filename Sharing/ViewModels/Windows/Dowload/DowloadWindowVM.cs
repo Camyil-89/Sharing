@@ -242,6 +242,13 @@ namespace Sharing.ViewModels.Windows.Dowload
 			DowloadInfo = new DowloadInfo();
 			DowloadInfo.PathSaveProgress = path;
 			DowloadInfo.LoadInfo();
+
+			foreach (var file in DowloadInfo.Files)
+			{
+				file.BlockSize = BlockSize;
+			}
+			DowloadInfo.SaveInfo();
+
 			Task.Run(() => { Dowload(); });
 			Task.Run(() => { WatcherStatInfo(); });
 			

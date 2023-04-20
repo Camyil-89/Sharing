@@ -14,9 +14,9 @@ namespace Sharing.Services
     {
 		public static Settings Instance => App.Host.Services.GetRequiredService<Settings>();
 
-		private System.Version _Version = Assembly.GetEntryAssembly().GetName().Version;
+		private string _Version = Assembly.GetEntryAssembly().GetName().Version.ToString().Replace(".0.0", "");
 		/// <summary>версия приложения</summary>
-		public System.Version Version { get => _Version; set => Set(ref _Version, value); }
+		public string Version { get => _Version; set => Set(ref _Version, value); }
 
 
 

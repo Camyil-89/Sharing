@@ -47,7 +47,8 @@ namespace Sharing.Services.Net.Server
 
 		public static void Stop()
 		{
-			ServerProcess.Kill();
+			if (ServerProcess != null)
+				ServerProcess.Kill();
 			ServerProcess = null;
 			MainWindowVM.VisibilityServerStatus = System.Windows.Visibility.Collapsed;
 			SharingPageVM.StartStopButtonText = "Запустить";
@@ -58,6 +59,7 @@ namespace Sharing.Services.Net.Server
 		{
 			ServerProcess = new Process();
 			ServerProcess.StartInfo = new ProcessStartInfo($"{Environment.CurrentDirectory}\\Sharing.Http.Server.exe", $"--urls http://[]:{Settings.Instance.Parametrs.ServerPort}");
+			ServerProcess.StartInfo.CreateNoWindow = true;
 			ServerProcess.Start();
 			Task.Run(() =>
 			{
@@ -111,11 +113,5 @@ namespace Sharing.Services.Net.Server
 		{
 			return ServerProcess == null ? StatusServer.Shutdown : StatusServer.OK; //Http.Server.Services.Server.IsStarted ? Sharing.Server.StatusServer.Started : Sharing.Server.StatusServer.Stop;
 		}
-		//public static Sharing.Server.StatusServer GetStatusServer()
-		//{
-		//	if (Server != null)
-		//		return Server.Status;
-		//	return Sharing.Server.StatusServer.Stop;
-		//}
 	}
 }

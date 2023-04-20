@@ -43,7 +43,7 @@
 						<ListView.ItemTemplate>
 							<DataTemplate>
 								<StackPanel Orientation="Horizontal">
-									<CUI:ToolTipTextBlock Text="{Binding Path}" Width="250" TextTrimming="CharacterEllipsis" ToolTipService.ToolTip="{Binding Path}"/>
+									<CUI:ToolTipTextBlock Text="{Binding Path}" Width="250" TextTrimming="CharacterEllipsis" ToolTipService.ToolTip="{Binding Path}" ToolTipService.InitialShowDelay="100"/>
 								</StackPanel>
 							</DataTemplate>
 						</ListView.ItemTemplate>

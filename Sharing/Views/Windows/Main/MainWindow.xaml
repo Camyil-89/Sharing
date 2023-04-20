@@ -7,7 +7,7 @@
         xmlns:FrameUI="clr-namespace:Sharing.CustomUI.FrameUI"
 		xmlns:vm="clr-namespace:Sharing.ViewModels.Windows.Main"
         mc:Ignorable="d"
-        Title="Шары"
+        Title="{Binding Settings.Version, StringFormat=Шары {0}}"
 		WindowStartupLocation="CenterScreen"
 		ResizeMode="CanMinimize"
 		Height="600"
@@ -61,7 +61,7 @@
 							Command="{Binding OpenMenuCommand}"
 							CommandParameter="{Binding DowloadPage, Source={StaticResource Locator}}"/>
 				</StackPanel>
-				<StackPanel Orientation="Vertical" Grid.Row="1" VerticalAlignment="Bottom">
+				<!--<StackPanel Orientation="Vertical" Grid.Row="1" VerticalAlignment="Bottom">
 					<Button Style="{StaticResource LeftMenuButton}"
 							Width="190"
 							Margin="0 0 0 5"
@@ -69,7 +69,7 @@
 							Tag="{Binding FocusSettingsMenu}"
 							Command="{Binding OpenMenuCommand}"
 							CommandParameter="{Binding SettingsPage, Source={StaticResource Locator}}"/>
-				</StackPanel>
+				</StackPanel>-->
 			</Grid>
 			<DockPanel Grid.Column="1">
 				<Frame FrameUI:DisableNavigation.Disable="True"  NavigationUIVisibility="Hidden" Content="{Binding SelectedPage}"/>

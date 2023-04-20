@@ -85,6 +85,8 @@ namespace Sharing.Models
 		{
 			get => _MaxSizeBlock; set
 			{
+				if (value < 2048)
+					value = 2048;
 				Set(ref _MaxSizeBlock, value);
 				TextMaxSizeBlock = Utilities.RoundByte(value);
 			}
