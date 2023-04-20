@@ -19,7 +19,7 @@
 			<Button Style="{StaticResource LeftMenuButton}" Content="{Binding StartStopButtonText}" Command="{Binding StartStopServerCommand}" Height="30"/>
 		</StackPanel>
 		<TabControl Grid.Row="1">
-			<TabItem Header="Клиенты">
+			<!--<TabItem Header="Клиенты">
 				<ListView ItemsSource="{Binding Clients}">
 					<ListView.ItemTemplate>
 						<DataTemplate>
@@ -32,7 +32,7 @@
 						</DataTemplate>
 					</ListView.ItemTemplate>
 				</ListView>
-			</TabItem>
+			</TabItem>-->
 			<TabItem Header="Файлы">
 				<Grid>
 					<Grid.ColumnDefinitions>
